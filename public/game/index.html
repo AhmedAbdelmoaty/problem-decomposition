@@ -433,7 +433,23 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     factoryOwner:{file:'factory-owner.wav',ms:4171},
     factoryGuard:{file:'factory-guard.wav',ms:2851},
     cupboard:{file:'cupboard-bump.wav',ms:5651},
-    collision:{file:'collision-drivers.wav',ms:7771}
+    collision:{file:'collision-drivers.wav',ms:7771},
+    cityAngryFindHelp:{file:'city/01-angry-find-someone-else.mp3',ms:3200},
+    cityAngrySoon:{file:'city/02-angry-you-said-soon.mp3',ms:3920},
+    cityAngryDoSomething:{file:'city/03-angry-do-something.mp3',ms:3520},
+    cityWinLightsBack:{file:'city/04-win-lights-back-thanks.mp3',ms:5280},
+    cityWinThanks:{file:'city/05-win-thank-you.mp3',ms:3360},
+    cityWinHospital:{file:'city/06-win-hospital-homes.mp3',ms:4240},
+    cityHomeDontRun:{file:'city/07-home-dont-run.mp3',ms:3040},
+    cityHomeCandle:{file:'city/08-home-light-candle.mp3',ms:2720},
+    cityHomeHeat:{file:'city/09-home-air-conditioner.mp3',ms:3040},
+    cityAngryRepairman:{file:'city/11-angry-fault-or-repairman.mp3',ms:4000},
+    cityAngryRegret:{file:'city/12-angry-regret-calling-you.mp3',ms:2960},
+    cityAngryPatience:{file:'city/13-angry-patience.mp3',ms:3440},
+    cityWinContinue:{file:'city/14-win-continue-day.mp3',ms:2960},
+    cityHospitalCare:{file:'city/15-hospital-critical-care.mp3',ms:2640},
+    cityHospitalNursery:{file:'city/16-hospital-nursery.mp3',ms:2880},
+    cityHospitalGenerator:{file:'city/17-hospital-generator.mp3',ms:3600}
   };
   var voiceTrack=null, voiceTimers=[];
   function clearVoiceTimers(){voiceTimers.forEach(function(id){clearTimeout(id);});voiceTimers=[];}
@@ -853,6 +869,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function lose(reason){
     G.view='lost';S.why=reason;hush();bubble.hidden=true;sfx('lose');
+    if(L&&L.city){
+      var o=pick(CITY_LOSE_LINES);
+      voiceTimers.push(setTimeout(function(){
+        playVoice(o.audio,function(){showBubble(o,false,VOICE[o.audio].ms);});
+      },350));
+    }
   }
   setInterval(function(){
     if(!inPlay()||!race()) return;
@@ -877,7 +899,19 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'جار في الضلمة',role:'neighbor',t:'آآه! اتخبطت في الدولاب! منه لله اللي قطع النور!',audio:'cupboard',fx:'thud'},
       {who:'عامل',role:'worker',t:'وردية كاملة راحت علينا، وبكرة يقولوا الشغل اتأخر ليه.',audio:'factoryWorker'},
       {who:'صاحبة الورشة',role:'factory',t:'المكن واقف والشغل متراكم. يا رب النور يرجع.',audio:'factoryOwner'},
-      {who:'حارس البوابة',role:'guard',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'}
+      {who:'حارس البوابة',role:'guard',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'},
+      {who:'راجل من الشارع',role:'angryResident',t:'يا باشا، لو مش عارف قول لنا نشوف حد تاني.',audio:'cityAngryFindHelp'},
+      {who:'واحد من السكان',role:'angryResident',t:'يا معلم، كل شوية تقول قربنا… قربنا دي بقالها ساعة.',audio:'cityAngrySoon'},
+      {who:'صاحب محل',role:'shopkeeper',t:'يا عم النور مش هيرجع لوحده، اعمل لنا أي حاجة.',audio:'cityAngryDoSomething'},
+      {who:'أم من العمارة',role:'mother',t:'يا بنتي بلاش تجري، هتخبطي في الترابيزة.',audio:'cityHomeDontRun'},
+      {who:'أم ياسين',role:'mother',t:'يا ابني ولّع الشمعة اللي في الدرج، بسرعة.',audio:'cityHomeCandle'},
+      {who:'أبو ياسين',role:'father',t:'التكييف فصل والعرق جاب آخره.',audio:'cityHomeHeat'},
+      {who:'راجل متعصب',role:'angryResident',t:'يا عم هو العطل في الكهربا ولا في اللي بيصلّحها؟',audio:'cityAngryRepairman'},
+      {who:'واحد من السكان',role:'angryResident',t:'يا عم، ما تخلّيناش نندم إننا ندهنا عليك.',audio:'cityAngryRegret'},
+      {who:'جار زهقان',role:'elder',t:'ربنا يصبّرنا عليك… وعلى الكهربا.',audio:'cityAngryPatience'},
+      {who:'دكتور المستشفى',role:'doctor',t:'خلي حد واقف جنب جهاز الرعاية، احتياطي.',audio:'cityHospitalCare'},
+      {who:'مشرفة التمريض',role:'nurseLead',t:'يا تمريض، حد يطمن على الأطفال في الحضّانة.',audio:'cityHospitalNursery'},
+      {who:'فني المستشفى',role:'hospitalTech',t:'المستشفى على المولّد، خلّصوا الموضوع قبل ما يبقى فيه مصيبة.',audio:'cityHospitalGenerator'}
     ],
     business:[
       {who:'صاحب المحل',role:'shopkeeper',t:'يا خسارة، اليوم قرب يخلص ولسه الدنيا هادية.'},
@@ -885,6 +919,20 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'موظفة المحل',role:'cashier',t:'يا نهار أبيض، اليوم ده مش راضي يعدّي.'}
     ]
   };
+  var CITY_LOSE_LINES=[
+    {who:'راجل من الشارع',role:'angryResident',t:'يا باشا، لو مش عارف قول لنا نشوف حد تاني.',audio:'cityAngryFindHelp'},
+    {who:'واحد من السكان',role:'angryResident',t:'يا معلم، كل شوية تقول قربنا… قربنا دي بقالها ساعة.',audio:'cityAngrySoon'},
+    {who:'صاحب محل',role:'shopkeeper',t:'يا عم النور مش هيرجع لوحده، اعمل لنا أي حاجة.',audio:'cityAngryDoSomething'},
+    {who:'راجل متعصب',role:'angryResident',t:'يا عم هو العطل في الكهربا ولا في اللي بيصلّحها؟',audio:'cityAngryRepairman'},
+    {who:'واحد من السكان',role:'angryResident',t:'يا عم، ما تخلّيناش نندم إننا ندهنا عليك.',audio:'cityAngryRegret'},
+    {who:'جار زهقان',role:'elder',t:'ربنا يصبّرنا عليك… وعلى الكهربا.',audio:'cityAngryPatience'}
+  ];
+  var CITY_WIN_LINES=[
+    {who:'أم ياسين',role:'mother',t:'أهو رجع! الحمد لله يا رب! تسلم إيدك يا باشا، ربنا يفتحها في وشك.',audio:'cityWinLightsBack'},
+    {who:'واحدة من السكان',role:'mother',t:'تسلم إيدك يا باشا، ربنا يفتحها في وشك.',audio:'cityWinThanks'},
+    {who:'مشرفة التمريض',role:'nurseLead',t:'ربنا يجازيك خير، المستشفى والبيوت رجعوا يتنفسوا.',audio:'cityWinHospital'},
+    {who:'أم من العمارة',role:'mother',t:'كده نعرف نكمل يومنا بقى، كتر خيرك.',audio:'cityWinContinue'}
+  ];
   var BAG={key:'',q:[],last:null};
   function nextLine(){
     var key=(L&&!L.city)?'business':'city', pool=EXTRA_LINES[key];
@@ -909,6 +957,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     cashier:{f:1,shirt:'#e78bab',skin:'#c98263',hair:'#4a2f3f',long:1},
     nurse:{f:1,shirt:'#6bc8ba',skin:'#d39470',hijab:'#f2f6fb'},
     doctor:{f:0,shirt:'#f7fbff',skin:'#c98263',hair:'#2b2d4a',glasses:1},
+    femaleDoctor:{f:1,shirt:'#f7fbff',skin:'#d39470',hijab:'#54749a',coat:1,stethoscope:1,badge:1,mood:'serious'},
+    nurseLead:{f:1,shirt:'#5fc5b8',skin:'#c98263',hijab:'#edf6f7',stethoscope:1,badge:1,mood:'worried'},
+    hospitalTech:{f:0,shirt:'#3f6f82',skin:'#a86a4c',hair:'#242844',vest:1,badge:1,mood:'worried'},
+    angryResident:{f:0,shirt:'#a35f4f',skin:'#b97455',hair:'#282941',stache:'#282941',mood:'angry'},
+    father:{f:0,shirt:'#527da1',skin:'#c98263',hair:'#30345a',stache:'#30345a',collar:1,mood:'tired'},
     elder:{f:0,shirt:'#8a7a5c',skin:'#b97455',hair:'#c9c9d6',stache:'#d8d8e2',glasses:1},
     neighbor:{f:0,shirt:'#6d8f6a',skin:'#c98263',hair:'#30345a'},
     shopkeeper:{f:0,shirt:'#4f7fa8',skin:'#b97455',hair:'#2a2440',stache:'#2a2440',apron:1},
@@ -924,6 +977,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     if(c.hijab) o+='<path d="M22 60Q20 14 61 12Q102 14 100 60Q104 104 82 110H40Q18 104 22 60Z" fill="'+c.hijab+'" stroke="#29315d" stroke-width="5"/>';
     o+='<path d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+c.shirt+'" stroke="#29315d" stroke-width="5"/>';
     if(c.apron) o+='<path d="M44 108h34v47H44Z" fill="#f2ead8" stroke="#29315d" stroke-width="3"/>';
+    if(c.vest) o+='<path d="M30 112h20l11 14 11-14h20l8 43H22Z" fill="#f0a84f" stroke="#29315d" stroke-width="3"/><path d="M31 128h60M39 112v43M83 112v43" stroke="#ffe099" stroke-width="3" opacity=".9"/>';
+    if(c.coat) o+='<path d="M25 109h27l9 17 10-17h27l9 46H15Z" fill="#f7fbff" stroke="#29315d" stroke-width="3"/><path d="M52 109l9 17 10-17M61 126v29" fill="none" stroke="#9eb1c7" stroke-width="2.5"/>';
+    if(c.collar) o+='<path d="M45 105l16 15 17-15" fill="none" stroke="#c8d9e7" stroke-width="4"/>';
     if(c.f&&!c.hijab) o+='<path d="M50 104l11 12 11-12" fill="none" stroke="#fff3" stroke-width="3"/>';
     o+=c.hijab?'<ellipse cx="61" cy="60" rx="27" ry="33" fill="'+c.skin+'" stroke="#29315d" stroke-width="4"/>'
       :'<ellipse cx="61" cy="58" rx="'+(c.f?30:33)+'" ry="39" fill="'+c.skin+'" stroke="#29315d" stroke-width="5"/>';
@@ -933,16 +989,22 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       if(c.bun) o+='<circle cx="61" cy="9" r="11" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
     }
     // eyes
-    if(c.f) o+='<path d="M42 56l4-3M80 56l-4-3" stroke="#283059" stroke-width="2.5" stroke-linecap="round"/>';
+    if(c.mood==='angry') o+='<path d="M39 50l15 5M70 55l15-5" stroke="#283059" stroke-width="4" stroke-linecap="round"/>';
+    else if(c.mood==='worried'||c.mood==='tired') o+='<path d="M39 55l15-4M70 51l15 4" stroke="#283059" stroke-width="3" stroke-linecap="round"/>';
+    else if(c.f) o+='<path d="M42 56l4-3M80 56l-4-3" stroke="#283059" stroke-width="2.5" stroke-linecap="round"/>';
     else o+='<path d="M40 52h14M70 52h14" stroke="'+(c.hair||'#283059')+'" stroke-width="4" stroke-linecap="round"/>';
     o+='<ellipse cx="48" cy="62" rx="3.5" ry="4.7" fill="#283059"/><ellipse cx="76" cy="62" rx="3.5" ry="4.7" fill="#283059"/>';
     if(c.glasses) o+='<circle cx="48" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><circle cx="76" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><path d="M57 62h10" stroke="#29315d" stroke-width="3"/>';
-    if(c.f) o+='<ellipse cx="40" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/><ellipse cx="82" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/>'+
+    if(c.mood==='angry') o+='<path d="M50 88q11-9 23 0" fill="none" stroke="#6b3a45" stroke-width="4" stroke-linecap="round"/>';
+    else if(c.mood==='worried'||c.mood==='tired'||c.mood==='serious') o+='<path d="M51 87q10-5 21 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
+    else if(c.f) o+='<ellipse cx="40" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/><ellipse cx="82" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/>'+
       '<path d="M52 83q9 7 18 0" fill="#c4566b" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>';
     else o+='<path d="M51 86q10 6 22 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
     if(c.stache) o+='<path d="M47 78q14-8 28 0q-14 4-28 0Z" fill="'+c.stache+'" stroke="#24234d" stroke-width="2"/>';
     if(c.helmet) o+='<path d="M23 37Q25 9 60 9q35 0 37 28Z" fill="#ffd459" stroke="#29315d" stroke-width="4"/><path d="M19 38h82v8H19Z" fill="#f5ad4c" stroke="#29315d" stroke-width="3"/>';
     if(c.cap) o+='<path d="M27 38Q28 12 61 12Q94 12 95 38Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="4"/><path d="M60 36h48l-4 8H60Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="3"/>';
+    if(c.stethoscope) o+='<path d="M45 112q0 21 16 21t17-21M61 133v8" fill="none" stroke="#29315d" stroke-width="3"/><circle cx="61" cy="144" r="5" fill="#98c8cf" stroke="#29315d" stroke-width="3"/>';
+    if(c.badge) o+='<rect x="76" y="116" width="17" height="12" rx="2" fill="#f4f7ff" stroke="#29315d" stroke-width="2"/><path d="M80 121h9" stroke="#5a6f94" stroke-width="2"/>';
     return o+'</svg>';
   }
   var DR={i:0,next:0,hide:0,fast:0};
@@ -1272,7 +1334,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     G.view='won';
     hush();
     if(L.city){
-      showBubble({t:'النور جه! الحمد لله!',left:'30%',bottom:'50%'},true);
+      var o=pick(CITY_WIN_LINES);
+      playVoice(o.audio,function(){showBubble(o,true,VOICE[o.audio].ms);});
     }else bubble.hidden=true;
     sfx('win');
   }
