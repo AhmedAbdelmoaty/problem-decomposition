@@ -1,0 +1,136 @@
+/* Presentation only: no clue or answer is encoded by a decorative color. */
+:root{--bg:#14182e;--surface:#fff9e9;--ink:#25264b;--muted:#656987;--line:#d4c9b4;--lamp:#ffcf61;--lamp-text:#885211}
+body{background:radial-gradient(circle at 82% 6%,#303466 0,transparent 38%),radial-gradient(circle at 4% 84%,#283d59 0,transparent 42%),#14182e;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.26;background-image:radial-gradient(#d2d8ef 1px,transparent 1px);background-size:37px 37px;mask-image:linear-gradient(#000,transparent 58%)}
+.app{max-width:1420px;gap:28px;padding:24px 32px 60px}
+.stage{border:7px solid #69639c;border-bottom:13px solid #27234e;border-radius:28px;background:linear-gradient(#121634,#37345d 75%,#594259);box-shadow:0 0 0 5px #19182e,0 25px 0 -10px #0b0e24,0 35px 65px #060812aa;transform:translateZ(0)}
+.stage::after{border:2px solid #ffffff26;inset:8px;border-radius:18px}
+.stage::before{content:"";position:absolute;inset:-30% 0 0;z-index:2;pointer-events:none;background:linear-gradient(104deg,transparent 28%,#c8d5ff0d 39%,transparent 48%);animation:searchlight 11s ease-in-out infinite alternate}
+@keyframes searchlight{to{transform:translateX(33%)}}
+.stage svg#sky{width:100%;display:block;filter:drop-shadow(0 8px 2px #0b1026)}
+.stage svg#sky{transform-origin:center;transition:filter .35s ease}
+.stage .scene-label{fill:#fff2ce;font:700 11px "Almarai",Tahoma,sans-serif;paint-order:stroke;stroke:#171936;stroke-width:1px}
+.stage .scene-small{fill:#fff3dc;font:700 8px "Almarai",Tahoma,sans-serif}
+.stage .scene-window{transition:fill .7s ease}
+.stage.on .scene-window,.stage.lit .scene-window,.stage.scene-repaired .scene-window{fill:#ffd47f;opacity:1}
+.stage .scene-moon{filter:drop-shadow(0 0 14px #c4d6ff)}
+.stage .scene-cloud{animation:drift 12s ease-in-out infinite alternate}
+.stage .scene-smoke{animation:smokeFloat 3s ease-in-out infinite alternate}
+@keyframes smokeFloat{to{transform:translate(5px,-9px);opacity:.12}}
+.stage:not(.on):not(.lit) .scene-lamp{animation:lampFail 7s steps(1,end) infinite;filter:drop-shadow(0 0 4px #efd08d)}
+.stage:not(.on):not(.lit) .scene-lamp.offset{animation-delay:-3.6s}
+@keyframes lampFail{0%,47%,50%,54%,100%{opacity:.48}48%,49%,52%{opacity:.13}55%,62%{opacity:.7}}
+.stage.on .scene-lamp,.stage.lit .scene-lamp{filter:drop-shadow(0 0 9px #ffdb87)}
+.stage .scene-car-one{animation:carNudgeOne 1.5s ease-out both}
+.stage .scene-car-two{animation:carNudgeTwo 1.5s ease-out both}
+.stage .scene-bump-star{opacity:0;animation:bumpFlash 1.5s ease-out both}
+@keyframes carNudgeOne{0%{transform:translateX(-40px)}55%,100%{transform:translateX(9px)}}
+@keyframes carNudgeTwo{0%{transform:translateX(35px)}55%,100%{transform:translateX(-9px)}}
+@keyframes bumpFlash{0%,49%,70%,100%{opacity:0;transform:scale(.5);transform-origin:center}55%{opacity:.9;transform:scale(1)}}
+.stage h1{top:18px;inset-inline-start:20px;font-size:clamp(2.1rem,3.1vw,3.25rem);line-height:1;color:#fff3d9;text-shadow:0 5px 0 #11112b,0 0 20px #ffcf6150;z-index:3}
+.stage .round{top:81px;inset-inline-start:22px;z-index:3;background:#211e49dc;border:2px solid #8585b0;color:#ffe9ba;box-shadow:0 4px 0 #111126;font-weight:800}
+.mute{z-index:9;top:18px;inset-inline-end:18px;width:44px;height:44px;background:#2a2b56;border:2px solid #9f9bc9;box-shadow:0 4px 0 #0b0e2c;color:#fff}
+.mute:hover{transform:translateY(-2px);background:#42406c}
+.stage .halo{opacity:.13;animation:moonBreath 5s ease-in-out infinite alternate}
+.stage .moon{filter:drop-shadow(0 0 15px #d9d7ff)}
+@keyframes moonBreath{to{opacity:.25}}
+.stage .bat{animation-duration:13s;filter:drop-shadow(0 2px 0 #272a54)}
+.stage .b{stroke:#1b1d43;stroke-width:1}
+.stage .roof{fill:#423d75;stroke:#8c85bb;stroke-width:1.2}
+.stage .door{fill:#151a3d}
+.stage .w{stroke:#6472a2;stroke-width:.25}
+.stage .lamp-head{fill:#ffdc84;filter:drop-shadow(0 0 6px #ffc765)}
+.stage .hosp{fill:#404274;stroke:#9d97ca;stroke-width:1.2}
+.stage .hw{filter:drop-shadow(0 0 2px #8ff4c0)}
+.stage .zone{transition:fill .18s ease}
+.stage.tap .zone:hover{fill:#ffdd6540}
+.stage .zl{font-size:9px;fill:#fff6c7;stroke:#25264f;stroke-width:3.5px}
+.stage[data-zone] .zz{transition:opacity .6s ease}
+.stage.on,.stage.lit{background:linear-gradient(#34326b,#946a8b 70%,#e29469)}
+.stage.on .w,.stage.lit .w{filter:drop-shadow(0 0 3px #ffd763)}
+.stage.party::before{animation:partyFall 2.7s linear infinite}
+.stage .depth-back{fill:#3b3968;opacity:.8}
+.stage .street{fill:#272c56}
+.stage .street-line{stroke:#eac588;stroke-width:1.5;stroke-dasharray:17 13}
+.stage .traffic{animation:trafficRoll 12s linear infinite;opacity:.85}
+.stage .traffic.t2{animation-duration:17s;animation-direction:reverse;animation-delay:-7s}
+@keyframes trafficRoll{from{transform:translateX(-100px)}to{transform:translateX(450px)}}
+.stage .tree-top{fill:#263c52;stroke:#556d70;stroke-width:1}
+.stage .tree-trunk{stroke:#30314f;stroke-width:2}
+.stage.on .tree-top,.stage.lit .tree-top{fill:#42726d}
+.stage .awning{fill:#b76a80;stroke:#332c59;stroke-width:1.4}
+.stage .balcony{fill:none;stroke:#a798bd;stroke-width:1}
+.stage .sign{fill:#f3cf75;stroke:#403465;stroke-width:1}
+.stage .shop-glass{fill:#4c6c89;stroke:#93a1b8;stroke-width:1}
+.stage.on .shop-glass,.stage.lit .shop-glass{fill:#f4be7a}
+.actor{filter:drop-shadow(0 7px 1px #090a2c);animation:actorPop .42s cubic-bezier(.14,1.6,.44,1) both,actorIdle 3s ease-in-out .45s infinite}
+@keyframes actorIdle{50%{translate:0 -4px}}
+.bubble{background:#fff8e6;border:4px solid #514977;box-shadow:0 7px 0 #1a1838,0 17px 32px #0b0e2f9c;color:#292849;font-size:1rem;padding:12px 16px}
+.bubble::after{border-top-color:#fff8e6}
+.bubble .speaker{color:#885494;font-size:.78rem}
+.bubble.joy{background:#ffdf80;border-color:#c3735a}
+.bubble.joy::after{border-top-color:#ffdf80}
+.play-column{position:relative;min-width:0;background:linear-gradient(160deg,#33335f,#24234b);border:4px solid #696495;border-radius:26px;box-shadow:0 9px 0 #12112d,0 25px 40px #080a2494;padding:18px 20px 26px;color:#fff7e3}
+.play-column::before{content:"ملف القضية  ◈  اقرأ • قسّم • اكتشف";display:block;color:#ffdb83;font-weight:800;font-size:.82rem;letter-spacing:.01em;border-bottom:2px dashed #9993c15c;padding:0 3px 12px;margin-bottom:15px}
+.panel{background:linear-gradient(160deg,#fffaf0,#f6eee0);border:3px solid #e5c789;border-radius:21px;box-shadow:0 6px 0 #9c7690,0 12px 20px #11112e63;color:#25264b;padding:16px 18px}
+.panel h2{font-size:1.2rem;color:#3a335c}
+.panel .now{color:#d67951;font-size:2.9rem;text-shadow:2px 3px 0 #efc893}
+.panel .usual,.panel .unit{color:#6f6680}
+.say{color:#fff8eb;font-size:1.02rem;line-height:1.8;margin:20px 4px 13px}
+.say.note{color:#f8dfb5}
+.clues{gap:10px;margin:12px 0 17px}
+.clues li{position:relative;background:#f7eacb;border:2px solid #e0bb77;border-inline-start:8px solid #e69b61;border-radius:4px 14px 14px 4px;box-shadow:5px 5px 0 #17173770;color:#312b50;font-weight:700;padding:10px 14px}
+.clues li::before{content:"";position:absolute;top:5px;inset-inline-end:6px;width:8px;height:8px;border-radius:50%;background:#ad829d}
+.bar{border:3px solid #a393c1;background:#211f48;border-radius:14px;color:#ffe7ae;box-shadow:0 4px 0 #12122f;padding:9px 12px}
+.pip{width:15px;height:15px}
+.grid{gap:12px}
+.tile{background:linear-gradient(145deg,#efeaf3,#fff8df);color:#2a294d;border:3px solid #b7a6c6;border-bottom-width:5px;box-shadow:0 5px 0 #75699c,0 10px 18px #13123573;border-radius:15px;min-height:96px;padding:12px 15px}
+.tile:not([disabled]):hover{background:linear-gradient(145deg,#fff3c7,#ffe3a6);border-color:#e0ad69;box-shadow:0 8px 0 #a87570,0 13px 22px #1312358a}
+.tile:focus-visible,.btn:focus-visible{outline:4px solid #f9d46f;outline-offset:3px}
+.tile .n{font-size:1rem}
+.tile .v{color:#6c4f92}
+.tile .u,.tile .tag{color:#6b6783}
+.tile.clear{background:#e2f1e7;border-color:#8fb898}
+.btn{background:linear-gradient(#ffe39a,#ffc760);color:#2d2848;border:3px solid #fff2ca;border-bottom-color:#c9795e;border-radius:17px;box-shadow:0 6px 0 #a45c61,0 12px 20px #17133070;font-size:1.05rem;min-height:56px}
+.btn:not([disabled]):hover{background:linear-gradient(#fff0b6,#ffd17c)}
+.btn.ghost{background:#e9e8f4;color:#302d59;border-color:#bcb2d6;box-shadow:0 5px 0 #81779e}
+.btn.ghost:not([disabled]):hover{background:#fff2d5}
+.crumbs{color:#fff3da}
+.crumbs button{background:#f8dfaa;color:#46345d;border-color:#f1bd71}
+.crumbs span.here{color:#fff4d4}
+.msg:not(:empty){border:2px solid #eaa3a6;color:#ffdedf;background:#814c68}
+.msg.good:not(:empty){border-color:#a4dbba;color:#e8ffeb;background:#3d715d}
+.ev,.lesson{background:#fff4ce;color:#352d52;border-color:#ebae58;border-radius:12px;padding:12px}
+.found{color:#2c2c50}
+.timer .tl,.timer .tnum{color:#ffe1aa}
+.board{color:#25264b}
+@media(min-width:900px){
+  .app{grid-template-columns:minmax(0,1.3fr) minmax(390px,.82fr)}
+  .stage{top:32px}.stage svg#sky{height:min(79vh,730px);object-fit:cover}
+  .play-column{max-height:none;overflow:visible;grid-column:2;padding:18px 20px 26px}
+  .play-column .panel.mt{margin-top:0}
+  .actor{height:36%;max-width:190px}
+}
+@media(max-width:899px){
+  .app{max-width:650px;padding:12px 12px 40px}
+  .play-column{margin-top:21px}
+  .stage svg#sky{min-height:285px}
+}
+@media(max-width:480px){
+  .app{padding:10px 9px 30px}
+  .stage{border-width:5px;border-bottom-width:9px;border-radius:21px}
+  .stage svg#sky{min-height:270px}
+  .stage h1{font-size:1.75rem;top:14px;inset-inline-start:13px}
+  .stage .round{top:55px;inset-inline-start:13px;font-size:.64rem}
+  .mute{top:12px;inset-inline-end:10px;width:37px;height:37px}
+  .play-column{padding:14px 13px 22px}
+  .bubble{font-size:.74rem;padding:7px 10px;max-width:71%}
+  .actor{height:46%;width:29%}
+  .panel{padding:13px 14px}
+  .grid{gap:9px}
+  .tile{min-height:85px;padding:9px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .stage::before,.stage .halo,.actor,.stage.party::before,.stage .traffic,.stage .scene-cloud,.stage .scene-smoke,.stage .scene-lamp,.stage .scene-car-one,.stage .scene-car-two,.stage .scene-bump-star{animation:none}
+  .stage svg#sky{transition:none}
+}
