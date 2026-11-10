@@ -78,6 +78,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.26;b
 .panel .usual,.panel .unit{color:#6f6680}
 .say{color:#fff8eb;font-size:1.02rem;line-height:1.8;margin:20px 4px 13px}
 .say.note{color:#f8dfb5}
+.panel .say{color:#3a335c}
+.panel .say.note{color:#7a4a17;font-weight:700}
 .clues{gap:10px;margin:12px 0 17px}
 .clues li{position:relative;background:#f7eacb;border:2px solid #e0bb77;border-inline-start:8px solid #e69b61;border-radius:4px 14px 14px 4px;box-shadow:5px 5px 0 #17173770;color:#312b50;font-weight:700;padding:10px 14px}
 .clues li::before{content:"";position:absolute;top:5px;inset-inline-end:6px;width:8px;height:8px;border-radius:50%;background:#ad829d}
