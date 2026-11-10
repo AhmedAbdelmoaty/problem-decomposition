@@ -872,16 +872,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   var EXTRA_LINES={
     city:[
       {who:'أم ياسين',role:'mother',t:'العيال مش عارفين يذاكروا والامتحان بكرة. حرام عليكم بقى!',audio:'mother'},
-      {who:'عم راضي',role:'worker',t:'النور قاطع بقاله ساعتين! هو محدش بيرد على البلاغات؟',audio:'neighbor'},
-      {who:'صاحب المحل',role:'shopkeeper',t:'الأكل اللي في التلاجة هيبوظ. مين هيعوّضنا بس؟',audio:'shopkeeper'}
-    ],
-    factory:[
+      {who:'عم راضي',role:'elder',t:'النور قاطع بقاله ساعتين! هو محدش بيرد على البلاغات؟',audio:'neighbor'},
+      {who:'صاحب المحل',role:'shopkeeper',t:'الأكل اللي في التلاجة هيبوظ. مين هيعوّضنا بس؟',audio:'shopkeeper'},
+      {who:'جار في الضلمة',role:'neighbor',t:'آآه! اتخبطت في الدولاب! منه لله اللي قطع النور!',audio:'cupboard',fx:'thud'},
       {who:'عامل',role:'worker',t:'وردية كاملة راحت علينا، وبكرة يقولوا الشغل اتأخر ليه.',audio:'factoryWorker'},
       {who:'صاحبة الورشة',role:'factory',t:'المكن واقف والشغل متراكم. يا رب النور يرجع.',audio:'factoryOwner'},
-      {who:'حارس البوابة',role:'worker',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'}
-    ],
-    street:[
-      {collision:true,audio:'collision'}
+      {who:'حارس البوابة',role:'guard',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'}
     ],
     business:[
       {who:'صاحب المحل',role:'shopkeeper',t:'يا خسارة، اليوم قرب يخلص ولسه الدنيا هادية.'},
@@ -889,30 +885,65 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'موظفة المحل',role:'cashier',t:'يا نهار أبيض، اليوم ده مش راضي يعدّي.'}
     ]
   };
-  function activeLines(){
-    if(!L) return EXTRA_LINES.city;
-    if(!L.city) return EXTRA_LINES.business;
-    if(G.li===2) return EXTRA_LINES.factory;
-    return G.li===0&&collisionReady()?EXTRA_LINES.city.concat(EXTRA_LINES.street):EXTRA_LINES.city;
+  var BAG={key:'',q:[],last:null};
+  function nextLine(){
+    var key=(L&&!L.city)?'business':'city', pool=EXTRA_LINES[key];
+    if(BAG.key!==key){BAG.key=key;BAG.q=[];}
+    if(!BAG.q.length){
+      BAG.q=pool.slice();
+      for(var i=BAG.q.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=BAG.q[i];BAG.q[i]=BAG.q[j];BAG.q[j]=x;}
+      if(BAG.q.length>1&&BAG.q[BAG.q.length-1]===BAG.last){var y=BAG.q[0];BAG.q[0]=BAG.q[BAG.q.length-1];BAG.q[BAG.q.length-1]=y;}
+    }
+    BAG.last=BAG.q.pop();return BAG.last;
   }
+  var collisionUntil=0;
   function collisionReady(){
     if(!inPlay()||!L||!L.city||G.li!==0) return false;
     var nodes=S.path||[],dim=nodes[1],parts=nodes.slice(1).filter(function(n){return n.kind!=='dim';});
     return !!(dim&&dim.kind==='dim'&&dim.key==='place'&&parts.length===2);
   }
+  var CHAR={
+    mother:{f:1,shirt:'#c77fa8',skin:'#c98263',hijab:'#7a4f8a'},
+    factory:{f:1,shirt:'#5f8fc9',skin:'#d39470',hair:'#3b2a4f',bun:1},
+    customer:{f:1,shirt:'#e9a35b',skin:'#e0a37e',hijab:'#3f7f8c'},
+    cashier:{f:1,shirt:'#e78bab',skin:'#c98263',hair:'#4a2f3f',long:1},
+    nurse:{f:1,shirt:'#6bc8ba',skin:'#d39470',hijab:'#f2f6fb'},
+    doctor:{f:0,shirt:'#f7fbff',skin:'#c98263',hair:'#2b2d4a',glasses:1},
+    elder:{f:0,shirt:'#8a7a5c',skin:'#b97455',hair:'#c9c9d6',stache:'#d8d8e2',glasses:1},
+    neighbor:{f:0,shirt:'#6d8f6a',skin:'#c98263',hair:'#30345a'},
+    shopkeeper:{f:0,shirt:'#4f7fa8',skin:'#b97455',hair:'#2a2440',stache:'#2a2440',apron:1},
+    worker:{f:0,shirt:'#f3b645',skin:'#a86a4c',hair:'#30345a',helmet:1,stache:'#30345a'},
+    guard:{f:0,shirt:'#3d4f7d',skin:'#9b5f45',hair:'#1f2238',cap:'#25305a',stache:'#1f2238'},
+    driver:{f:0,shirt:'#d0614f',skin:'#c98263',hair:'#2b2d4a',cap:'#d0614f'},
+    driver2:{f:0,shirt:'#4fa38f',skin:'#a86a4c',hair:'#1f2238',stache:'#1f2238',glasses:1}
+  };
   function characterSvg(role){
-    var woman=['doctor','nurse','mother','factory','customer','cashier'].indexOf(role)>=0;
-    var shirt=role==='worker'?'#f3b645':role==='nurse'?'#6bc8ba':role==='doctor'?'#f7fbff':role==='cashier'?'#e78bab':'#dc76a1';
-    var hair=woman?'#493264':'#30345a';
-    return '<svg viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
-      '<ellipse cx="61" cy="150" rx="43" ry="5" fill="#080e30" opacity=".3"/>'+
-      '<path d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+shirt+'" stroke="#29315d" stroke-width="5"/>'+
-      '<ellipse cx="61" cy="58" rx="32" ry="39" fill="#c98263" stroke="#29315d" stroke-width="5"/>'+
-      '<path d="M26 43Q27 10 60 12Q91 12 96 43Q78 35 71 24Q52 43 26 43Z" fill="'+hair+'" stroke="#24234d" stroke-width="4"/>'+
-      '<ellipse cx="48" cy="62" rx="3.5" ry="4.7" fill="#283059"/><ellipse cx="76" cy="62" rx="3.5" ry="4.7" fill="#283059"/>'+
-      '<path d="M51 83q10 8 22 0" fill="none" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>'+
-      (role==='worker'?'<path d="M23 37Q25 9 60 9q35 0 37 28Z" fill="#ffd459" stroke="#29315d" stroke-width="4"/><path d="M19 38h82v8H19Z" fill="#f5ad4c" stroke="#29315d" stroke-width="3"/>':'')+
-      '</svg>';
+    var c=CHAR[role]||CHAR.neighbor, o='<svg viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+      '<ellipse cx="61" cy="150" rx="43" ry="5" fill="#080e30" opacity=".3"/>';
+    if(c.long) o+='<path d="M27 50Q22 100 34 112h54q12-12 7-62Z" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
+    if(c.hijab) o+='<path d="M22 60Q20 14 61 12Q102 14 100 60Q104 104 82 110H40Q18 104 22 60Z" fill="'+c.hijab+'" stroke="#29315d" stroke-width="5"/>';
+    o+='<path d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+c.shirt+'" stroke="#29315d" stroke-width="5"/>';
+    if(c.apron) o+='<path d="M44 108h34v47H44Z" fill="#f2ead8" stroke="#29315d" stroke-width="3"/>';
+    if(c.f&&!c.hijab) o+='<path d="M50 104l11 12 11-12" fill="none" stroke="#fff3" stroke-width="3"/>';
+    o+=c.hijab?'<ellipse cx="61" cy="60" rx="27" ry="33" fill="'+c.skin+'" stroke="#29315d" stroke-width="4"/>'
+      :'<ellipse cx="61" cy="58" rx="'+(c.f?30:33)+'" ry="39" fill="'+c.skin+'" stroke="#29315d" stroke-width="5"/>';
+    if(!c.hijab&&!c.helmet&&!c.cap){
+      o+=c.f?'<path d="M28 50Q26 12 61 11Q96 12 94 50Q84 30 61 27Q40 30 28 50Z" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>'
+        :'<path d="M28 40Q30 14 61 14Q92 14 94 40Q82 28 61 28Q40 28 28 40Z" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
+      if(c.bun) o+='<circle cx="61" cy="9" r="11" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
+    }
+    // eyes
+    if(c.f) o+='<path d="M42 56l4-3M80 56l-4-3" stroke="#283059" stroke-width="2.5" stroke-linecap="round"/>';
+    else o+='<path d="M40 52h14M70 52h14" stroke="'+(c.hair||'#283059')+'" stroke-width="4" stroke-linecap="round"/>';
+    o+='<ellipse cx="48" cy="62" rx="3.5" ry="4.7" fill="#283059"/><ellipse cx="76" cy="62" rx="3.5" ry="4.7" fill="#283059"/>';
+    if(c.glasses) o+='<circle cx="48" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><circle cx="76" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><path d="M57 62h10" stroke="#29315d" stroke-width="3"/>';
+    if(c.f) o+='<ellipse cx="40" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/><ellipse cx="82" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/>'+
+      '<path d="M52 83q9 7 18 0" fill="#c4566b" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>';
+    else o+='<path d="M51 86q10 6 22 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
+    if(c.stache) o+='<path d="M47 78q14-8 28 0q-14 4-28 0Z" fill="'+c.stache+'" stroke="#24234d" stroke-width="2"/>';
+    if(c.helmet) o+='<path d="M23 37Q25 9 60 9q35 0 37 28Z" fill="#ffd459" stroke="#29315d" stroke-width="4"/><path d="M19 38h82v8H19Z" fill="#f5ad4c" stroke="#29315d" stroke-width="3"/>';
+    if(c.cap) o+='<path d="M27 38Q28 12 61 12Q94 12 95 38Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="4"/><path d="M60 36h48l-4 8H60Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="3"/>';
+    return o+'</svg>';
   }
   var DR={i:0,next:0,hide:0,fast:0};
   function showBubble(o,joyful,ms){
@@ -925,10 +956,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function playCollision(){
     var beats=[
-      {at:250,ms:2300,who:'سواق العربية',role:'worker',t:'يا عم خد بالك! إنت حكّيتلي العربية.',left:'5%',bottom:'42%'},
-      {at:2950,ms:2400,who:'السواق التاني',role:'shopkeeper',t:'الإشارة واقفة والشارع ضلمة. والله ما شفتك!',right:'5%',bottom:'42%',tr:true},
-      {at:5750,ms:1750,who:'سواق العربية',role:'worker',t:'طب بصّ قدامك وإنت بتلف يا أخي!',left:'5%',bottom:'42%'}
+      {at:250,ms:2300,who:'سواق العربية',role:'driver',t:'يا عم خد بالك! إنت حكّيتلي العربية.',left:'5%',bottom:'42%'},
+      {at:2950,ms:2400,who:'السواق التاني',role:'driver2',t:'الإشارة واقفة والشارع ضلمة. والله ما شفتك!',right:'5%',bottom:'42%',tr:true},
+      {at:5750,ms:1750,who:'سواق العربية',role:'driver',t:'طب بصّ قدامك وإنت بتلف يا أخي!',left:'5%',bottom:'42%'}
     ];
+    collisionUntil=Date.now()+VOICE.collision.ms+300;DR.next=collisionUntil+600;
     playVoice('collision',function(){
       beats.forEach(function(beat){voiceTimers.push(setTimeout(function(){if(dramaOn()) showBubble(beat,false,beat.ms);},beat.at));});
     });
@@ -943,10 +975,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       DR.next=now+1800;return;
     }
     if(now<DR.next) return;
-    var lines=activeLines(),o=lines[DR.i%lines.length];DR.i++;
-    if(o.collision){
-      DR.next=now+VOICE.collision.ms+1400;playCollision();return;
-    }
+    if(now<collisionUntil){DR.next=collisionUntil+600;return;}
+    if(voiceTrack&&!voiceTrack.paused&&!voiceTrack.ended){DR.next=now+800;return;}
+    var o=nextLine();DR.i++;
     if(o.fx==='thud') DR.fast=2;
     var duration=o.audio?VOICE[o.audio].ms:5000;
     DR.next=now+(o.audio?duration+2200:(DR.fast>0?900:9000));
@@ -969,14 +1000,17 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     var mode=(active&&view!=='won'&&parts.length)?axis+'-'+parts.length:(dim?axis:'overview');
     var key=[scene,G.li,mode,parts.join('|'),view==='won'?'won':''].join(':');
     if(key===sceneKey) return;
-    if(sceneKey&&(inPlay()||view==='home')){
-      hush();bubble.hidden=true;actor.hidden=true;DR.hide=0;DR.next=Date.now()+650;
+    if(sceneKey&&view==='home'){
+      hush();collisionUntil=0;bubble.hidden=true;actor.hidden=true;DR.hide=0;DR.next=Date.now()+650;
     }
     sceneKey=key;stage.dataset.scene=mode;
     if(!active||view==='won'||(axis==='place'&&!parts.length)){
       if(scene==='shop') drawShop(); else drawSky(L&&L.city?L.srcZone:null);
     }else if(window.renderMysteryScene){
       sky.innerHTML=window.renderMysteryScene({city:!!L.city,level:G.li,axis:axis,path:parts.length?parts:[dim?dim.name:'']});
+    }
+    if(inPlay()&&L&&L.city&&sky.querySelector('.scene-car-one')&&Date.now()>=collisionUntil){
+      bubble.hidden=true;actor.hidden=true;DR.hide=0;playCollision();
     }
     sky.setAttribute('aria-label',scene==='shop'?'منظر من محل الإلكترونيات: '+(parts[parts.length-1]||'الفروع'):
       'منظر '+(parts[parts.length-1]||'المدينة')+' بالليل');
@@ -1059,8 +1093,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     return '<section class="panel mt"><h2>مستشفى المدينة على المولّد</h2>'+
       '<p>الكهربا قطعت عن المدينة كلها. مهمتك تلاقي السبب بالتحليل، والتحليل معناه التفكيك: تاخد الرقم العام وتقسّمه لحد ما السبب يبان.</p>'+
       '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+
-      '<button class="btn" data-act="mode" data-m="learn">وضع التعلّم: من غير عدّاد</button>'+
-      '<button class="btn ghost" data-act="mode" data-m="race"'+(lock?' disabled':'')+'>وضع التحدي: عدّاد ولوحة ترتيب</button>'+
+      (lock?'<button class="btn" data-act="mode" data-m="learn">وضع التعلّم: من غير عدّاد</button>'+
+        '<button class="btn ghost" data-act="mode" data-m="race" disabled>وضع التحدي: عدّاد ولوحة ترتيب</button>'
+       :'<button class="btn" data-act="mode" data-m="race">وضع التحدي: عدّاد ولوحة ترتيب</button>')+
       (lock?'<p class="say note">وضع التحدي بيتفتح بعد ما تخلّص وضع التعلّم.</p>':'')+'</section>';
   }
 
