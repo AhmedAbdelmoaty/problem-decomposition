@@ -339,44 +339,43 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
 
   /* ---------- sound and haptics ---------- */
   var AC=null, sound=store('dc_sound')!=='0';
-  var actionEffects=new Set(), sceneEffects=new Set();
-  function prepareEffects(){
-    if(!sound) return;
+  var SAMPLES={click:'button.ogg',open:'answer_select.ogg',fix:'correct.ogg',confirm:'evidence.ogg',wrong:'wrong.ogg',back:'notebook.ogg',win:'perfect_win.ogg',lose:'defeat.ogg'};
+  var SAMPLE_DIR='../assets/behind-dots/audio/';
+  var samplePools={};
+  Object.keys(SAMPLES).forEach(function(key){
+    var item=new Audio(SAMPLE_DIR+SAMPLES[key]);item.preload='auto';samplePools[key]=[item];
+  });
+  function sample(key,volume){
+    if(!sound||!samplePools[key]) return;
     try{
-      var Context=window.AudioContext||window.webkitAudioContext;
-      if(!AC&&Context) AC=new Context();
-      if(AC&&AC.state==='suspended') AC.resume().catch(function(){});
+      var pool=samplePools[key],item=pool.find(function(a){return a.paused||a.ended;});
+      if(!item){item=new Audio(SAMPLE_DIR+SAMPLES[key]);pool.push(item);}
+      item.currentTime=0;item.volume=volume==null?1:volume;
+      var result=item.play();if(result&&result.catch) result.catch(function(){});
     }catch(e){}
   }
-  function playSource(source,group,start,end){
-    source.start(start);
-    group.add(source);
-    source.addEventListener('ended',function(){group.delete(source);source.disconnect();},{once:true});
-    if(end!=null) source.stop(end);
-  }
-  function stopEffects(group){
-    group.forEach(function(source){source.disconnect();source.stop();});
-    group.clear();
-  }
+  function stopSamples(){Object.keys(samplePools).forEach(function(key){samplePools[key].forEach(function(item){item.pause();item.currentTime=0;});});hush();}
   function paintMute(){muteBtn.textContent=sound?'🔊':'🔇';}
-  function tone(f,d,type,vol,when,group){
-    if(!sound||!AC) return;
+  function tone(f,d,type,vol,when){
+    if(!sound) return;
     try{
+      if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C) return;AC=new C();}
+      if(AC.state==='suspended') AC.resume();
       var t=AC.currentTime+(when||0), o=AC.createOscillator(), g=AC.createGain();
       o.type=type||'sine';o.frequency.value=f;
       g.gain.setValueAtTime(vol||0.08,t);
       g.gain.exponentialRampToValueAtTime(0.0001,t+d);
-      o.connect(g);g.connect(AC.destination);playSource(o,group||actionEffects,t,t+d+0.02);
+      o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+0.02);
     }catch(e){}
   }
   function noiseBuf(dur,fill){
     var len=Math.floor(AC.sampleRate*dur), buf=AC.createBuffer(1,len,AC.sampleRate);
     fill(buf.getChannelData(0),len,AC.sampleRate);return buf;
   }
-  function playBuf(buf,t,freq,q,vol,type,group){
+  function playBuf(buf,t,freq,q,vol,type){
     var ns=AC.createBufferSource(), f=AC.createBiquadFilter(), g=AC.createGain();
     ns.buffer=buf;f.type=type||'bandpass';f.frequency.value=freq;f.Q.value=q;g.gain.value=vol;
-    ns.connect(f);f.connect(g);g.connect(AC.destination);playSource(ns,group,t);
+    ns.connect(f);f.connect(g);g.connect(AC.destination);ns.start(t);
   }
   /* joy when the lights come back: applause, zaghrouta and whistles */
   function joy(when){
@@ -391,7 +390,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
           for(var n=0;n<tail;n++) d[at+n]+=(Math.random()*2-1)*a*Math.exp(-n/(sr*0.0035));
         }
       });
-      playBuf(claps,t0,2200,0.7,0.14,'bandpass',actionEffects);
+      playBuf(claps,t0,2200,0.7,0.14);
       [[1180,0.15],[1420,0.7]].forEach(function(z){
         var st=t0+z[1], len=1.5, o=AC.createOscillator(), g=AC.createGain(), l=AC.createOscillator(), lg=AC.createGain();
         o.type='triangle';
@@ -404,8 +403,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
         g.gain.setValueAtTime(0.025,st+len-0.1);
         g.gain.exponentialRampToValueAtTime(0.0001,st+len);
         o.connect(g);g.connect(AC.destination);
-        playSource(o,actionEffects,st,st+len+0.05);
-        playSource(l,actionEffects,st,st+len+0.05);
+        o.start(st);l.start(st);o.stop(st+len+0.05);l.stop(st+len+0.05);
       });
       [1.3,2.2].forEach(function(w){
         var st=t0+w, o=AC.createOscillator(), g=AC.createGain();
@@ -413,17 +411,18 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
         o.frequency.exponentialRampToValueAtTime(2600,st+0.18);
         o.frequency.exponentialRampToValueAtTime(1900,st+0.42);
         g.gain.setValueAtTime(0.022,st);g.gain.exponentialRampToValueAtTime(0.0001,st+0.45);
-        o.connect(g);g.connect(AC.destination);playSource(o,actionEffects,st,st+0.5);
+        o.connect(g);g.connect(AC.destination);o.start(st);o.stop(st+0.5);
       });
     }catch(e){}
   }
   function thud(){
-    if(!sound||!AC) return;
-    tone(75,0.3,'sine',0.12,0,sceneEffects);tone(48,0.35,'sine',0.09,0.03,sceneEffects);
+    if(!sound) return;
+    tone(75,0.3,'sine',0.12);tone(48,0.35,'sine',0.09,0.03);
     try{
-      playBuf(noiseBuf(0.12,function(d,len){for(var i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);}),AC.currentTime,300,0.8,0.5,'lowpass',sceneEffects);
+      if(AC) playBuf(noiseBuf(0.12,function(d,len){for(var i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);}),AC.currentTime,300,0.8,0.5,'lowpass');
     }catch(e){}
   }
+  function icu(){[0,0.45,0.9].forEach(function(w){tone(988,0.12,'sine',0.025,w);});}
   /* Recorded Egyptian dialogue: never fall back to the browser's synthetic voice. */
   var VOICE_DIR='audio/';
   var VOICE={
@@ -436,29 +435,47 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     cupboard:{file:'cupboard-bump.wav',ms:5651},
     collision:{file:'collision-drivers.wav',ms:7771}
   };
+  var voiceTrack=null, voiceTimers=[];
+  function clearVoiceTimers(){voiceTimers.forEach(function(id){clearTimeout(id);});voiceTimers=[];}
+  function hush(){
+    clearVoiceTimers();
+    if(voiceTrack){try{voiceTrack.pause();voiceTrack.currentTime=0;}catch(e){} voiceTrack=null;}
+  }
+  function primeVoice(){}
+  function playVoice(key,onstart){
+    hush();
+    var meta=VOICE[key];if(!meta) return;
+    if(!sound){if(onstart) onstart();return;}
+    try{
+      voiceTrack=new Audio(VOICE_DIR+meta.file);voiceTrack.preload='auto';voiceTrack.volume=1;
+      voiceTrack.addEventListener('play',function(){if(onstart) onstart();},{once:true});
+      voiceTrack.play().catch(function(){if(onstart) onstart();});
+    }catch(e){if(onstart) onstart();}
+  }
   function powerRise(){
-    if(!sound||!AC) return;
+    if(!sound) return;
     tone(100,0.09,'sine',0.025);
     try{
       var t=AC.currentTime+0.04,o=AC.createOscillator(),g=AC.createGain();
       o.type='triangle';o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(720,t+0.62);
       g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.045,t+0.13);
       g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);
-      o.connect(g);g.connect(AC.destination);playSource(o,actionEffects,t,t+0.72);
+      o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+0.72);
       [0.16,0.3,0.48].forEach(function(w,i){tone(820+i*190,0.08,'sine',0.014,w);});
     }catch(e){}
   }
 
   function buzz(p){try{if(navigator.vibrate) navigator.vibrate(p);}catch(e){}}
   function sfx(name){
-    stopEffects(actionEffects);
-    if(name==='click'){tone(600,0.045,'triangle',0.055);}
-    else if(name==='back'){tone(390,0.055,'triangle',0.05);}
-    else if(name==='open'){tone(520,0.09,'triangle',0.09);tone(780,0.1,'triangle',0.075,0.07);}
-    else if(name==='fix'){if(L&&L.city) powerRise();else tone(988,0.25,'triangle',0.11,0.1);}
-    else if(name==='wrong'){tone(220,0.2,'triangle',0.08);buzz(35);}
-    else if(name==='lose'){tone(245,0.25,'triangle',0.06);tone(185,0.35,'triangle',0.05,0.24);buzz(90);}
+    if(name==='click'){sample('click',0.95);tone(600,0.045,'triangle',0.055);}
+    else if(name==='back'){sample('back',0.95);tone(390,0.055,'triangle',0.05);}
+    else if(name==='open'){sample('open',1);tone(520,0.09,'triangle',0.09);tone(780,0.1,'triangle',0.075,0.07);}
+    else if(name==='fix'){sample('fix',1);if(L&&L.city) powerRise();else{sample('confirm',1);tone(988,0.25,'triangle',0.11,0.1);}}
+    else if(name==='power'){sample('fix',1);powerRise();}
+    else if(name==='wrong'){sample('wrong',1);tone(220,0.2,'triangle',0.08);buzz(35);}
+    else if(name==='lose'){sample('lose',1);tone(245,0.25,'triangle',0.06);tone(185,0.35,'triangle',0.05,0.24);buzz(90);}
     else if(name==='win'){
+      sample('win',1);
       [523,659,784,1047].forEach(function(f,i){tone(f,0.22,'triangle',0.075,i*0.11);});
       joy(0.55);
       buzz([40,60,40,60,120]);
@@ -466,10 +483,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   muteBtn.addEventListener('click',function(){
     sound=!sound;paintMute();store('dc_sound',sound?'1':'0');
-    if(!sound){
-      if(drama&&drama.skipAudio) drama.skipAudio();
-      stopEffects(actionEffects);stopEffects(sceneEffects);
-    }else{prepareEffects();sfx('click');}
+    if(!sound) stopSamples(); else sfx('click');
   });
   paintMute();
 
@@ -804,13 +818,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   var S={}, L=null;
 
   function startLevel(i){
-    closeDialogue();
     G.li=i;L=MAKERS[i]();
     S={path:[L.root],used:0,guessed:null,msg:'',good:false,fixed:[],deadline:0,lastSec:null,why:'',whyLeaf:null,whyPath:null,whyMiss:false,lit:[],secLeft:0};
     G.view='play';
     if(L.city) drawSky(L.srcZone); else drawShop();
+    DR.i=0;DR.next=Date.now()+900;DR.hide=0;bubble.hidden=true;actor.hidden=true;
     render();
-    enterDialogue();
   }
   function left(){return L.budget-S.used;}
   function cur(){return S.path[S.path.length-1];}
@@ -836,63 +849,56 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     tnum.textContent=s;
     timerEl.classList.toggle('hot',hot);
     stage.classList.toggle('hot',hot);
-    return hot?s:0;
+    if(hot&&s>0&&s!==S.lastSec){S.lastSec=s;tone(s<=3?1175:880,0.07,'square',0.05);if(s<=3) buzz(30);}
   }
   function lose(reason){
-    G.view='lost';S.why=reason;closeDialogue();sfx('lose');
+    G.view='lost';S.why=reason;hush();bubble.hidden=true;sfx('lose');
   }
   setInterval(function(){
     if(!inPlay()||!race()) return;
-    var s=paintTimer();
-    if(s>0&&s!==S.lastSec){S.lastSec=s;tone(s<=3?1175:880,0.07,'square',0.05);if(s<=3) buzz(30);}
+    paintTimer();
     if(S.deadline&&remMs()<=0){lose('time');render();}
   },100);
 
   /* ---------- drama: people of the dark city speak up ---------- */
-  var SCENE_LINES={
-    residential:[
+  var LINES=[
+    {t:'حرام عليكم! النور قاطع بقاله ساعتين!',left:'4%',bottom:'52%',audio:'neighbor'},
+    {t:'آآه! اتخبطت في الدولاب! منه لله اللي قطع النور!',left:'26%',bottom:'44%',audio:'cupboard',fx:'thud'},
+    {t:'دكتور المستشفى: المريض على جهاز الرعاية المركزة، والمولّد مش هيستحمل كتير!',
+     say:'المريض على جهاز الرعاية المركزة، والمولّد مش هيستحمل كتير! الحقونا!',right:'8px',bottom:'42%',tr:true,pitch:1,rate:1.25,fx:'icu'},
+    {t:'الأكل هيبوظ في التلاجة!',left:'10%',bottom:'40%',pitch:1.2,rate:1.1},
+    {t:'العيال خايفة من الضلمة يا جماعة!',left:'30%',bottom:'56%',pitch:1.7,rate:1.1}
+  ];
+  var EXTRA_LINES={
+    city:[
       {who:'أم ياسين',role:'mother',t:'العيال مش عارفين يذاكروا والامتحان بكرة. حرام عليكم بقى!',audio:'mother'},
-      {who:'عم راضي',role:'worker',t:'النور قاطع بقاله ساعتين! هو محدش بيرد على البلاغات؟',audio:'neighbor'}
-    ],
-    market:[
+      {who:'عم راضي',role:'worker',t:'النور قاطع بقاله ساعتين! هو محدش بيرد على البلاغات؟',audio:'neighbor'},
       {who:'صاحب المحل',role:'shopkeeper',t:'الأكل اللي في التلاجة هيبوظ. مين هيعوّضنا بس؟',audio:'shopkeeper'}
-    ],
-    home:[
-      {t:'آآه! اتخبطت في الدولاب! منه لله اللي قطع النور!',left:'26%',bottom:'44%',audio:'cupboard',thud:true}
     ],
     factory:[
       {who:'عامل',role:'worker',t:'وردية كاملة راحت علينا، وبكرة يقولوا الشغل اتأخر ليه.',audio:'factoryWorker'},
       {who:'صاحبة الورشة',role:'factory',t:'المكن واقف والشغل متراكم. يا رب النور يرجع.',audio:'factoryOwner'},
       {who:'حارس البوابة',role:'worker',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'}
     ],
-    street:[{audio:'collision',thud:true,beats:[
-      {at:250,ms:2300,who:'سواق العربية',role:'worker',t:'يا عم خد بالك! إنت حكّيتلي العربية.',left:'5%',bottom:'42%'},
-      {at:2950,ms:2400,who:'السواق التاني',role:'shopkeeper',t:'الإشارة واقفة والشارع ضلمة. والله ما شفتك!',right:'5%',bottom:'42%',tr:true},
-      {at:5750,ms:1750,who:'سواق العربية',role:'worker',t:'طب بصّ قدامك وإنت بتلف يا أخي!',left:'5%',bottom:'42%'}
-    ]}],
+    street:[
+      {collision:true,audio:'collision'}
+    ],
     business:[
       {who:'صاحب المحل',role:'shopkeeper',t:'يا خسارة، اليوم قرب يخلص ولسه الدنيا هادية.'},
       {who:'زبونة',role:'customer',t:'معلش، أنا هرجع أبص تاني بعد شوية.'},
       {who:'موظفة المحل',role:'cashier',t:'يا نهار أبيض، اليوم ده مش راضي يعدّي.'}
     ]
   };
-  function dialogueScene(){
-    if(!L.city) return 'business';
-    var dim=S.path[1], area=S.path[2];
-    if(!dim||!area) return;
-    if(G.view==='why'){
-      if((dim.key==='place'&&area.name===DIST[2][0]&&S.path.length===4)||
-         (dim.key==='type'&&area.name===TYPES[0][0])) return 'home';
-      return;
-    }
-    if(dim.key!=='place') return;
-    if(S.path.length===3){
-      if(G.li===2) return area.name===DIST[0][0]?'factory':undefined;
-      if(area.name===DIST[2][0]) return 'residential';
-      if(area.name===DIST[1][0]) return 'market';
-    }
-    // The impact marker is only rendered on streets with the scripted collision.
-    if(S.path.length===4&&sky.querySelector('.scene-bump-star')) return 'street';
+  function activeLines(){
+    if(!L) return EXTRA_LINES.city;
+    if(!L.city) return EXTRA_LINES.business;
+    if(G.li===2) return EXTRA_LINES.factory;
+    return G.li===0&&collisionReady()?EXTRA_LINES.city.concat(EXTRA_LINES.street):EXTRA_LINES.city;
+  }
+  function collisionReady(){
+    if(!inPlay()||!L||!L.city||G.li!==0) return false;
+    var nodes=S.path||[],dim=nodes[1],parts=nodes.slice(1).filter(function(n){return n.kind!=='dim';});
+    return !!(dim&&dim.kind==='dim'&&dim.key==='place'&&parts.length===2);
   }
   function characterSvg(role){
     var woman=['doctor','nurse','mother','factory','customer','cashier'].indexOf(role)>=0;
@@ -908,104 +914,48 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       (role==='worker'?'<path d="M23 37Q25 9 60 9q35 0 37 28Z" fill="#ffd459" stroke="#29315d" stroke-width="4"/><path d="M19 38h82v8H19Z" fill="#f5ad4c" stroke="#29315d" stroke-width="3"/>':'')+
       '</svg>';
   }
-  var drama=null, bubbleTimer;
-  function hideBubble(){
-    clearTimeout(bubbleTimer);
-    bubble.hidden=true;actor.hidden=true;
-  }
+  var DR={i:0,next:0,hide:0,fast:0};
   function showBubble(o,joyful,ms){
     var words=String(o.t).split(/\s+/).map(function(w,i){return '<span style="animation-delay:'+(i*0.025).toFixed(2)+'s">'+esc(w)+'</span>';}).join(' ');
     bubble.innerHTML=(o.who?'<strong class="speaker">'+esc(o.who)+'</strong>':'')+'<span class="speech">'+words+'</span>';
     bubble.className='bubble'+(o.tr?' tr':'')+(joyful?' joy':'');
     bubble.style.left=o.left||'5%';bubble.style.right=o.right||'auto';bubble.style.bottom=o.bottom||'42%';
     actor.innerHTML=characterSvg(o.role||'worker');actor.dataset.role=o.role||'worker';actor.className='actor'+(o.tr?' right':'');actor.hidden=false;
-    bubble.hidden=false;
-    clearTimeout(bubbleTimer);bubbleTimer=setTimeout(hideBubble,ms||5000);
+    bubble.hidden=false;DR.hide=Date.now()+(ms||5000);
   }
-  function later(visit,ms,fn){
-    var id=setTimeout(function(){
-      visit.timers.delete(id);
-      if(drama===visit) fn();
-    },ms);
-    visit.timers.add(id);
-    return id;
+  function playCollision(){
+    var beats=[
+      {at:250,ms:2300,who:'سواق العربية',role:'worker',t:'يا عم خد بالك! إنت حكّيتلي العربية.',left:'5%',bottom:'42%'},
+      {at:2950,ms:2400,who:'السواق التاني',role:'shopkeeper',t:'الإشارة واقفة والشارع ضلمة. والله ما شفتك!',right:'5%',bottom:'42%',tr:true},
+      {at:5750,ms:1750,who:'سواق العربية',role:'worker',t:'طب بصّ قدامك وإنت بتلف يا أخي!',left:'5%',bottom:'42%'}
+    ];
+    playVoice('collision',function(){
+      beats.forEach(function(beat){voiceTimers.push(setTimeout(function(){if(dramaOn()) showBubble(beat,false,beat.ms);},beat.at));});
+    });
+    if(G.view!=='home') thud();
   }
-  function releaseVoice(visit){
-    var track=visit.track;
-    visit.track=null;visit.skipAudio=null;
-    if(track){
-      track.pause();
-      track.removeAttribute('src');
-      track.load();
+  function dramaOn(){return inPlay()&&!!L;}
+  setInterval(function(){
+    var now=Date.now();
+    if(DR.hide&&now>DR.hide){bubble.hidden=true;actor.hidden=true;DR.hide=0;}
+    if(!dramaOn()){
+      if(!bubble.hidden&&G.view!=='lost'&&String(bubble.className).indexOf('joy')<0){bubble.hidden=true;actor.hidden=true;}
+      DR.next=now+1800;return;
     }
-  }
-  function stopDialogue(){
-    if(drama){
-      drama.timers.forEach(function(id){clearTimeout(id);});
-      drama.timers.clear();
-      releaseVoice(drama);
+    if(now<DR.next) return;
+    var lines=activeLines(),o=lines[DR.i%lines.length];DR.i++;
+    if(o.collision){
+      DR.next=now+VOICE.collision.ms+1400;playCollision();return;
     }
-    stopEffects(sceneEffects);
-    hideBubble();
-  }
-  function closeDialogue(){
-    stopDialogue();
-    drama=null;
-  }
-  function advanceDialogue(visit){
-    var line=visit.lines[visit.index++];
-    if(!line) return;
-    var meta=VOICE[line.audio], duration=meta?meta.ms:5000, started=false;
-    function startLine(){
-      if(started) return;
-      started=true;
-      if(line.beats){
-        line.beats.forEach(function(beat){
-          later(visit,beat.at,function(){showBubble(beat,false,beat.ms);});
-        });
-      }else showBubble(line,false,duration);
-      later(visit,duration,function(){
-        releaseVoice(visit);hideBubble();
-        if(visit.scene==='business') visit.index%=visit.lines.length;
-        var gap=meta?(line.beats?1400:2200):4000;
-        if(visit.index<visit.lines.length) later(visit,gap,function(){advanceDialogue(visit);});
-      });
+    if(o.fx==='thud') DR.fast=2;
+    var duration=o.audio?VOICE[o.audio].ms:5000;
+    DR.next=now+(o.audio?duration+2200:(DR.fast>0?900:9000));
+    if(DR.fast>0) DR.fast--;
+    if(o.audio) playVoice(o.audio,function(){showBubble(o,false,duration);});else showBubble(o,false,duration);
+    if(G.view!=='home'){
+      if(o.fx==='thud') thud(); else if(o.fx==='icu') icu();
     }
-    if(line.thud) thud();
-    if(!sound||!meta){startLine();return;}
-    var track=new Audio(VOICE_DIR+meta.file);
-    visit.track=track;
-    // A blocked or stalled recording still leaves the original text playable.
-    function fallback(){
-      if(drama!==visit||visit.track!==track) return;
-      clearTimeout(wait);visit.timers.delete(wait);
-      releaseVoice(visit);startLine();
-    }
-    var wait=later(visit,1500,fallback);
-    visit.skipAudio=fallback;
-    track.addEventListener('playing',function(){
-      if(drama!==visit||visit.track!==track) return;
-      clearTimeout(wait);visit.timers.delete(wait);
-      startLine();
-    },{once:true});
-    track.addEventListener('error',fallback,{once:true});
-    track.play().catch(fallback);
-  }
-  function enterDialogue(silentReturn){
-    var node=G.view==='why'?S.whyLeaf:cur();
-    if(drama&&drama.node===node) return;
-    closeDialogue();
-    var scene=silentReturn?null:dialogueScene(), lines=SCENE_LINES[scene];
-    var visit={node:node,scene:scene,lines:lines,index:0,timers:new Set(),track:null,skipAudio:null};
-    drama=visit;
-    if(!lines) return;
-    // The street animation flashes at 55% of its 1.5-second duration.
-    if(scene==='street') later(visit,825,function(){advanceDialogue(visit);});
-    else advanceDialogue(visit);
-  }
-  window.addEventListener('pagehide',function(){
-    stopDialogue();stopEffects(actionEffects);
-  });
+  },400);
 
   /* ---------- the stage follows the game ---------- */
   var sceneKey='';
@@ -1019,6 +969,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     var mode=(active&&view!=='won'&&parts.length)?axis+'-'+parts.length:(dim?axis:'overview');
     var key=[scene,G.li,mode,parts.join('|'),view==='won'?'won':''].join(':');
     if(key===sceneKey) return;
+    if(sceneKey&&(inPlay()||view==='home')){
+      hush();bubble.hidden=true;actor.hidden=true;DR.hide=0;DR.next=Date.now()+650;
+    }
     sceneKey=key;stage.dataset.scene=mode;
     if(!active||view==='won'||(axis==='place'&&!parts.length)){
       if(scene==='shop') drawShop(); else drawSky(L&&L.city?L.srcZone:null);
@@ -1049,6 +1002,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     c.toggle('party',v==='won'&&L&&!L.city);
     c.toggle('commerce',!!(L&&!L.city));
     stageTitle.textContent=L&&!L.city?'مين وقّف المبيعات؟':'مين طفّى المدينة؟';
+    if(L&&!L.city&&v==='play'){bubble.hidden=true;actor.hidden=true;}
     if(v==='home') roundEl.textContent='';
     else if(v==='reflect'||v==='board') roundEl.textContent='المدينة منوّرة';
     else roundEl.textContent='المهمة '+(G.li+1)+' من '+NL+': '+L.title;
@@ -1281,7 +1235,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     G.stars[G.li]=st;
     G.pts[G.li]=st*100+firsts*50+S.secLeft*10;
     G.view='won';
-    closeDialogue();
+    hush();
     if(L.city){
       showBubble({t:'النور جه! الحمد لله!',left:'30%',bottom:'50%'},true);
     }else bubble.hidden=true;
@@ -1332,21 +1286,19 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     S.msg='اتصلّح سبب، بس '+L.metric+' لسه بعيد عن المعتاد. فيه سبب تاني.';
     sfx('fix');
   }
-  function afterMove(silentReturn){
+  function afterMove(){
     if(inPlay()){
       if(left()<0||(left()<=0&&G.view==='play'&&!reachable(L.root))) lose('budget');
       else if(S.deadline&&remMs()<=0) lose('time');
     }
     render();
-    if(inPlay()) enterDialogue(silentReturn);
-    else window.scrollTo({top:0,behavior:'smooth'});
+    if(!inPlay()) window.scrollTo({top:0,behavior:'smooth'});
   }
 
   game.addEventListener('click',function(e){
     var b=e.target.closest('button[data-act]');
     if(!b||b.disabled) return;
     var act=b.getAttribute('data-act');
-    prepareEffects();stopEffects(actionEffects);
     if(act!=='tile'&&act!=='why') sfx(act==='up'?'back':'click');
     if(act==='mode'){G.mode=b.getAttribute('data-m');G.pts=[0,0,0,0];G.stars=[0,0,0,0];startLevel(0);return;}
     if(act==='next'){
@@ -1374,14 +1326,13 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     else if(act==='up'){S.path=S.path.slice(0,+b.getAttribute('data-i')+1);S.msg='';}
     else if(act==='tile'){openTile(+b.getAttribute('data-i'));}
     else if(act==='why'){answerWhy(+b.getAttribute('data-i'));}
-    afterMove(act==='why'&&G.view==='play');
+    afterMove();
   });
 
   /* tapping a district in the picture is the same as tapping its card */
   sky.addEventListener('click',function(e){
     var z=e.target.closest?e.target.closest('.zone'):null;
     if(!z||G.view!=='play'||!stage.classList.contains('tap')) return;
-    prepareEffects();stopEffects(actionEffects);
     openTile(4-(+z.getAttribute('data-z')));
     afterMove();
   });
