@@ -1,0 +1,46 @@
+:root{
+  --feel-ease-out:cubic-bezier(.22,1,.36,1);
+  --feel-ease-snap:cubic-bezier(.2,.9,.25,1.25);
+  --feel-fast:160ms;
+  --feel-medium:360ms;
+  --feel-slow:900ms;
+  --feel-depth-far:0;
+  --feel-depth-mid:1;
+  --feel-depth-play:2;
+  --feel-depth-character:3;
+  --feel-depth-front:4;
+  --feel-glow:#ffd76d;
+  --feel-danger:#ff7468;
+}
+
+.stage[data-feel-ready="true"]{
+  isolation:isolate;
+  transform:translateZ(0);
+}
+
+.stage [data-feel-layer]{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+.stage [data-feel-layer="far"]{z-index:var(--feel-depth-far)}
+.stage [data-feel-layer="mid"]{z-index:var(--feel-depth-mid)}
+.stage [data-feel-layer="play"]{z-index:var(--feel-depth-play)}
+.stage [data-feel-layer="character"]{z-index:var(--feel-depth-character)}
+.stage [data-feel-layer="front"]{z-index:var(--feel-depth-front)}
+
+@media (prefers-reduced-motion:reduce){
+  :root{
+    --feel-fast:1ms;
+    --feel-medium:1ms;
+    --feel-slow:1ms;
+  }
+  .stage[data-feel-ready="true"] *,
+  .stage[data-feel-ready="true"] *::before,
+  .stage[data-feel-ready="true"] *::after{
+    animation-duration:1ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:1ms!important;
+  }
+}
