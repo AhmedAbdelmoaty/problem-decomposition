@@ -1127,11 +1127,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function pips(){
     var h='';
     for(var i=0;i<L.budget;i++){h+='<span class="pip'+(i<left()?' left':'')+'"></span>';}
-    return '<div class="bar"><span>تفكيكات باقية: '+Math.max(0,left())+'</span><span class="pips" aria-hidden="true">'+h+'</span></div>';
+    return '<div class="bar breaker-hud"><span>تفكيكات باقية: '+Math.max(0,left())+'</span><span class="pips breaker-rail" aria-hidden="true">'+h+'</span></div>';
   }
   function crumbs(){
     if(S.path.length<2) return '';
-    var h='<nav class="crumbs" aria-label="مكانك في التفكيك">';
+    var h='<nav class="crumbs power-route" aria-label="مكانك في التفكيك">';
     S.path.forEach(function(n,i){
       if(i) h+='<span class="sep">‹</span>';
       if(i<S.path.length-1) h+='<button data-act="up" data-i="'+i+'">'+esc(n.name)+'</button>';
@@ -1147,7 +1147,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function panel(n){
     var title=n.kind==='dim'?L.rootName+' مفككة '+n.name:n.name;
-    return '<section class="panel"><h2>'+esc(title)+'</h2><div class="figs">'+
+    return '<section class="panel gauge-panel"><h2>'+esc(title)+'</h2><div class="figs">'+
       '<span class="now">'+fmt(n.actual)+'</span>'+
       '<span class="usual">المعتاد '+fmt(n.normal)+'</span>'+diffHtml(n)+
       '</div><div class="unit">'+L.unit+'</div></section>';

@@ -192,4 +192,19 @@ describe("game feel presentation runtime", () => {
     expect(app).toHaveAttribute("data-feel-event", "loss");
     expect(document.querySelector("button")).toBeEnabled();
   });
+
+  it("skins the existing HUD as a power-control board without changing action contracts", () => {
+    const html = readFileSync(gameHtmlPath, "utf8");
+    const css = readFileSync(feelCssPath, "utf8");
+
+    expect(html).toContain('<div class="bar breaker-hud">');
+    expect(html).toContain('<span class="pips breaker-rail" aria-hidden="true">');
+    expect(html).toContain('<nav class="crumbs power-route" aria-label="مكانك في التفكيك">');
+    expect(html).toContain('<section class="panel gauge-panel">');
+    expect(html).toContain('data-act="tile"');
+    expect(css).toContain(".breaker-hud");
+    expect(css).toContain(".power-route");
+    expect(css).toContain(".gauge-panel");
+    expect(css).toContain(".tile::before");
+  });
 });

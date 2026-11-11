@@ -106,6 +106,148 @@
 .mood-worried .character-body,.mood-tired .character-body{animation:feel-worried-posture 1.8s ease-in-out infinite alternate}
 .actor.joyful .character-svg{animation:feel-character-celebrate 640ms var(--feel-ease-snap) infinite alternate}
 
+/* The existing gameplay HUD reads as a small electricity control board. */
+.breaker-hud{
+  position:relative;
+  overflow:hidden;
+  border-color:#8294c5;
+  background:
+    linear-gradient(110deg,#26366f 0 48%,#1a275a 48% 52%,#26366f 52% 100%);
+  box-shadow:inset 0 1px 0 #ffffff20,0 5px 0 #10183d,0 10px 20px #0b12332b;
+}
+.breaker-hud::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid #aebbe83c;
+  border-radius:8px;
+  pointer-events:none;
+}
+.breaker-hud>span:first-child{position:relative;z-index:1;font-weight:800;letter-spacing:.01em}
+.breaker-rail{
+  position:relative;
+  z-index:1;
+  align-items:center;
+  gap:6px;
+  padding:5px 7px;
+  border:1px solid #7987b8;
+  border-radius:8px;
+  background:#111a43;
+  box-shadow:inset 0 2px 5px #060b24aa;
+}
+.breaker-rail .pip{
+  position:relative;
+  width:12px;
+  height:20px;
+  border-radius:4px;
+  border-color:#5e6c98;
+  background:linear-gradient(#26345f,#152045);
+  box-shadow:inset 0 1px 2px #ffffff14;
+  transform:translateY(1px);
+}
+.breaker-rail .pip::after{
+  content:"";
+  position:absolute;
+  inset:3px 2px auto;
+  height:3px;
+  border-radius:3px;
+  background:#6876a4;
+}
+.breaker-rail .pip.left{
+  border-color:#fff0a7;
+  background:linear-gradient(#fff4b0,#ffc54d);
+  box-shadow:0 0 10px #ffd15a99,inset 0 1px 0 #fff;
+  transform:translateY(-1px);
+}
+.breaker-rail .pip.left::after{background:#fff7d5}
+
+.power-route{
+  position:relative;
+  gap:7px;
+  padding:8px 9px 9px;
+  border:1px solid #a9b4d5;
+  border-radius:12px;
+  background:linear-gradient(180deg,#f6f3fb,#e8e8f5);
+  box-shadow:inset 0 1px 0 #fff,0 3px 0 #7a86af3d;
+}
+:root[data-theme="dark"] .power-route{background:linear-gradient(180deg,#222c59,#182047)}
+.power-route::before{
+  content:"";
+  position:absolute;
+  inset-inline:15px;
+  bottom:4px;
+  height:2px;
+  border-radius:2px;
+  background:linear-gradient(90deg,#6879ad,#ffd36d 78%,#fff1ad);
+  box-shadow:0 0 6px #ffd36d66;
+}
+.power-route button,.power-route .here{position:relative;z-index:1}
+.power-route .here{
+  border-radius:8px;
+  background:#ffd66f;
+  color:#302b57;
+  box-shadow:0 2px 0 #b87542,0 0 10px #ffda7488;
+}
+.power-route .sep{position:relative;z-index:1;font-size:1.1rem;color:#6978aa}
+
+.gauge-panel{
+  position:relative;
+  overflow:hidden;
+  border-color:#8d9cc7;
+  background:
+    radial-gradient(circle at 88% 20%,#ffe48a4d 0 3px,transparent 4px),
+    linear-gradient(145deg,var(--surface) 0 76%,color-mix(in srgb,var(--surface) 82%,#9eabd3) 76% 100%);
+  box-shadow:inset 0 1px 0 #fff8,0 5px 0 #5c6b963d,0 11px 24px #1826541a;
+}
+.gauge-panel::after{
+  content:"";
+  position:absolute;
+  inset-inline-end:11px;
+  top:11px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ffd45f;
+  box-shadow:0 0 9px #ffc83e;
+  animation:feel-panel-led 2.2s ease-in-out infinite alternate;
+}
+.gauge-panel .figs{
+  margin-top:8px;
+  padding:8px 10px;
+  border:1px solid color-mix(in srgb,var(--line) 78%,#6577ac);
+  border-radius:11px;
+  background:color-mix(in srgb,var(--surface) 88%,#dce5f3);
+  box-shadow:inset 0 2px 5px #26366214;
+}
+.gauge-panel .now{font-variant-numeric:tabular-nums;text-shadow:0 2px 0 #ffffffaa,0 0 10px #f2a84e38}
+
+.tile::before{
+  content:"";
+  position:absolute;
+  inset-inline-start:0;
+  top:0;
+  bottom:0;
+  width:6px;
+  background:linear-gradient(#7d8fbe,#a9b7d9);
+  box-shadow:2px 0 8px #52658a22;
+}
+.tile:not([disabled])::after{
+  content:"";
+  position:absolute;
+  inset-inline-end:11px;
+  bottom:10px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  border:2px solid #7f8db5;
+  background:#e8edf8;
+}
+.tile.clear::before{background:linear-gradient(#65c891,#2f8b60);box-shadow:2px 0 9px #38a87055}
+.tile.clear::after{background:#73dda3;border-color:#3a9567;box-shadow:0 0 8px #5ed797}
+.tile.still::before{background:linear-gradient(#979caf,#73798e)}
+
+@keyframes feel-panel-led{from{opacity:.55;filter:brightness(.9)}to{opacity:1;filter:brightness(1.25)}}
+
 @keyframes feel-sky-drift{
   from{transform:translate3d(-2px,0,0) scale(1.005)}
   to{transform:translate3d(3px,1px,0) scale(1.012)}
@@ -236,4 +378,5 @@
   .actor.joyful .character-svg{
     animation:none!important;
   }
+  .gauge-panel::after{animation:none!important}
 }
