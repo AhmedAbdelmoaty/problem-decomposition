@@ -457,6 +457,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     ,businessBranchLastWeek:{file:'business/03-shop-branch-last-week.mp3',ms:2508}
     ,businessDetails:{file:'business/04-shop-details-clean.mp3',ms:4415}
     ,businessWin:{file:'business/05-shop-win-clean.mp3',ms:2377}
+    ,businessWaiting:{file:'business/06-shop-waiting.mp3',ms:3120}
+    ,businessCustomerReturn:{file:'business/07-customer-return.mp3',ms:2720}
+    ,businessNoHope:{file:'business/08-shop-no-hope.mp3',ms:4800}
+    ,businessDayEnding:{file:'business/09-shop-day-ending.mp3',ms:2960}
+    ,businessWinSaveDay:{file:'business/10-shop-win-save-day.mp3',ms:4800}
+    ,cityAngryDoSomethingV2:{file:'city/18-angry-electrician-v2.mp3',ms:3680}
   };
   var voiceTrack=null, voiceTimers=[];
   function setVoicePlaying(on){app.setAttribute('data-voice-playing',on?'true':'false');}
@@ -946,7 +952,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'حارس البوابة',role:'guard',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'},
       {who:'راجل من الشارع',role:'angryResident',t:'يا باشا، لو مش عارف قول لنا نشوف حد تاني.',audio:'cityAngryFindHelp'},
       {who:'واحد من السكان',role:'angryResident',t:'يا معلم، كل شوية تقول قربنا… قربنا دي بقالها ساعة.',audio:'cityAngrySoon'},
-      {who:'صاحب محل',role:'shopkeeper',t:'يا عم النور مش هيرجع لوحده، اعمل لنا أي حاجة.',audio:'cityAngryDoSomething'},
+      {who:'صاحب محل',role:'shopkeeper',t:'يا باشمهندس، النور مش هيرجع لوحده، شوف لنا حل بقى!',audio:'cityAngryDoSomethingV2'},
       {who:'أم من العمارة',role:'mother',t:'يا بنتي بلاش تجري، هتخبطي في الترابيزة.',audio:'cityHomeDontRun'},
       {who:'أم ياسين',role:'mother',t:'يا ابني ولّع الشمعة اللي في الدرج، بسرعة.',audio:'cityHomeCandle'},
       {who:'أبو ياسين',role:'father',t:'التكييف فصل والعرق جاب آخره.',audio:'cityHomeHeat'},
@@ -964,15 +970,16 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'صاحب المحل',role:'shopkeeper',t:'الفرع ده كان شغال كويس الأسبوع اللي فات.',audio:'businessBranchLastWeek'},
       {who:'راجل متعصب',role:'angryResident',t:'يا عم خلّصنا، الفروع مستنية، في حاجة مستخبية في التفاصيل.',audio:'businessDetails'},
       {who:'صاحب المحل',role:'shopkeeper',t:'يا باشا، لو مش عارف قول لنا نجيب حد يساعدنا.'},
-      {who:'صاحب المحل',role:'shopkeeper',t:'يا خسارة، اليوم قرب يخلص ولسه الدنيا هادية.'},
-      {who:'زبونة',role:'customer',t:'معلش، أنا هرجع أبص تاني بعد شوية.'},
-      {who:'موظفة المحل',role:'cashier',t:'يا نهار أبيض، اليوم ده مش راضي يعدّي.'}
+      {who:'صاحب المحل',role:'shopkeeper',t:'اليوم قرب يخلص ولسه الدنيا هادية.',audio:'businessDayEnding'},
+      {who:'زبونة',role:'customer',t:'معلش أنا هرجع أبص تاني بعد شوية.',audio:'businessCustomerReturn'},
+      {who:'صاحب المحل',role:'shopkeeper',t:'يا أستاذ إحنا مش هنقضي اليوم كله مستنيين كده.',audio:'businessWaiting'},
+      {who:'موظفة المحل',role:'cashier',t:'من بدري وإحنا بنقول يمكن الدنيا تتحرك… مفيش فايدة.',audio:'businessNoHope'}
     ]
   };
   var CITY_LOSE_LINES=[
     {who:'راجل من الشارع',role:'angryResident',t:'يا باشا، لو مش عارف قول لنا نشوف حد تاني.',audio:'cityAngryFindHelp'},
     {who:'واحد من السكان',role:'angryResident',t:'يا معلم، كل شوية تقول قربنا… قربنا دي بقالها ساعة.',audio:'cityAngrySoon'},
-    {who:'صاحب محل',role:'shopkeeper',t:'يا عم النور مش هيرجع لوحده، اعمل لنا أي حاجة.',audio:'cityAngryDoSomething'},
+    {who:'صاحب محل',role:'shopkeeper',t:'يا باشمهندس، النور مش هيرجع لوحده، شوف لنا حل بقى!',audio:'cityAngryDoSomethingV2'},
     {who:'راجل متعصب',role:'angryResident',t:'يا عم هو العطل في الكهربا ولا في اللي بيصلّحها؟',audio:'cityAngryRepairman'},
     {who:'واحد من السكان',role:'angryResident',t:'يا عم، ما تخلّيناش نندم إننا ندهنا عليك.',audio:'cityAngryRegret'},
     {who:'جار زهقان',role:'elder',t:'ربنا يصبّرنا عليك… وعلى الكهربا.',audio:'cityAngryPatience'}
@@ -1392,7 +1399,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       playVoice(o.audio,function(){showBubble(o,true,VOICE[o.audio].ms);});
     }else{
       var bo=pick([
-        {who:'موظفة المحل',role:'cashier',t:'أهو البيع اتحرك تاني، الحمد لله، ربنا يكرمك يا باشا.',audio:'businessWin'}
+        {who:'موظفة المحل',role:'cashier',t:'أهو البيع اتحرك تاني، الحمد لله، ربنا يكرمك يا باشا.',audio:'businessWin'},
+        {who:'صاحب المحل',role:'shopkeeper',t:'تسلم إيدك يا باشا، كده نقدر نكمّل اليوم بدل ما نقفله بخسارة.',audio:'businessWinSaveDay'}
       ]);
       playVoice(bo.audio,function(){showBubble(bo,true,VOICE[bo.audio].ms);});
     }
