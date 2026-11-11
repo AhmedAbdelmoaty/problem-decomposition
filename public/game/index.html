@@ -452,8 +452,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     cityHospitalCare:{file:'city/15-hospital-critical-care.mp3',ms:2640},
     cityHospitalNursery:{file:'city/16-hospital-nursery.mp3',ms:2880},
     cityHospitalGenerator:{file:'city/17-hospital-generator.mp3',ms:3600}
-    ,businessDetails:{file:'business/04-angry-details.mp3',ms:10400}
-    ,businessWin:{file:'business/05-win-sales-moving.mp3',ms:7200}
+    ,businessNoMovement:{file:'business/01-shop-no-movement.mp3',ms:9680}
+    ,businessFirstInvoice:{file:'business/02-shop-first-invoice.mp3',ms:3520}
+    ,businessBranchLastWeek:{file:'business/03-shop-branch-last-week.mp3',ms:4720}
+    ,businessDetails:{file:'business/04-shop-details-clean.mp3',ms:10400}
+    ,businessWin:{file:'business/05-shop-win-clean.mp3',ms:10320}
   };
   var voiceTrack=null, voiceTimers=[];
   function setVoicePlaying(on){app.setAttribute('data-voice-playing',on?'true':'false');}
@@ -956,9 +959,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'فني المستشفى',role:'hospitalTech',t:'المستشفى على المولّد، خلّصوا الموضوع قبل ما يبقى فيه مصيبة.',audio:'cityHospitalGenerator'}
     ],
     business:[
-      {who:'موظفة المحل',role:'cashier',t:'من الصبح وإحنا فاتحين، ومفيش حركة.'},
-      {who:'صاحب المحل',role:'shopkeeper',t:'المحل مفتوح من بدري ولسه أول فاتورة ما اتعملتش.'},
-      {who:'صاحب المحل',role:'shopkeeper',t:'الفرع ده كان شغال كويس الأسبوع اللي فات.'},
+      {who:'موظفة المحل',role:'cashier',t:'من الصبح وإحنا فاتحين، ومفيش حركة.',audio:'businessNoMovement'},
+      {who:'صاحب المحل',role:'shopkeeper',t:'المحل مفتوح من بدري ولسه أول فاتورة ما اتعملتش.',audio:'businessFirstInvoice'},
+      {who:'صاحب المحل',role:'shopkeeper',t:'الفرع ده كان شغال كويس الأسبوع اللي فات.',audio:'businessBranchLastWeek'},
       {who:'راجل متعصب',role:'angryResident',t:'يا عم خلّصنا، الفروع مستنية، في حاجة مستخبية في التفاصيل.',audio:'businessDetails'},
       {who:'صاحب المحل',role:'shopkeeper',t:'يا باشا، لو مش عارف قول لنا نجيب حد يساعدنا.'},
       {who:'صاحب المحل',role:'shopkeeper',t:'يا خسارة، اليوم قرب يخلص ولسه الدنيا هادية.'},
