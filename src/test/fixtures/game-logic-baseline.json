@@ -1,0 +1,35 @@
+{
+  "sourceCommit": "65dae2b",
+  "dataCopySha256": "19ee986b29d463e49ba72e119b62339629f2411b02b426145c02d4ef1a53850b",
+  "functions": {
+    "why": "7f25601164dcaab1f395f65112c44a85066cac3805be0bd37f592abd9333e622",
+    "plant": "d488c8e40dcb10d47b2a441114f8e8c1a43bb0b0f16a430889e62a90ad042fd5",
+    "flatDim": "c5b0b9fe1f93442d6d4e08de20ea1055835e8bb1a8c815dacf3e3090119ee8c8",
+    "refreshFlat": "c360d548ef8858b1e52ac2f6b1c5c86b59d1806cbd58d6364fc448e778bccde2",
+    "recalc": "dd95d11ad54064f2e2f7e9a08af8759927998ba34cef06b2e406b255c3f6dd00",
+    "assemble": "f11133dcbbeb703d5a085f29a16c6f03f65ed5c15c80018955d6247c86f4ccf4",
+    "level1": "c6acb550002386b0d1cc9def0ed44d22120b29f318adfb1e625a131accbe12de",
+    "level2": "c651d68b02bbdc19a9e68969dfe0330360bfddffd860bf8fadd97105d1cf4765",
+    "level3": "284cfbcc406c16fdbabfb8cc83a03c72dce10e3a08ffda60b05f10ce25324bb0",
+    "level4": "34ae2b3318c3a4223cd96cf2712594cd4cdceb101566b52845f5c123505ebba2",
+    "startLevel": "5080031a63b3fc58e79805a0f5c31bb278f9f5bb59fdb10feb03581e45d5ccd1",
+    "starsFor": "c1acf2d08d2bce9d250cb53e88471b669cecf3e4101a8a108e7e46d1a44cfb63",
+    "lose": "acea3afe06f50984f74cc575c88f3c249f637e44a65876d8f0695263204f3c89",
+    "win": "ec61a1a63abe0213abeb3b963811f275846a332a4ad4febd24023f96764d9e7c",
+    "openTile": "ddc0660058fd2eb679bba35427bf6e797ddfe40fd7e5288853d08953c739517b",
+    "answerWhy": "7193b60c56f826cf305347505f7f7aae7fab0962caecef7597c1ec3746ac2e93",
+    "fixLeaf": "1605de6e457ca47e0b86b74390ee58e50c6c719db910ecf1f568576a6f3f524c"
+  },
+  "clickRouterSha256": "483e4350f5cc27f0b7841c6cb1de06bf86aa3a253eaad4ff777a0c10c29f8caf",
+  "numericRules": {
+    "penalty": 5,
+    "levels": {
+      "level1": { "opt": 3, "budget": 6, "time": 60 },
+      "level2": { "opt": 2, "budget": 5, "time": 45 },
+      "level3": { "opt": 5, "budget": 9, "time": 80 },
+      "level4": { "opt": 2, "budget": 5, "time": 45 }
+    },
+    "starsFormula": "function starsFor(){return S.used<=L.opt?3:(S.used<=L.opt+2?2:1);}",
+    "scoreFormula": "st*100+firsts*50+S.secLeft*10"
+  }
+}

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Lalezar&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="game-feel.css">
 <script src="scene-art.js"></script>
 <style>
 :root{
@@ -433,24 +434,44 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     factoryOwner:{file:'factory-owner.wav',ms:4171},
     factoryGuard:{file:'factory-guard.wav',ms:2851},
     cupboard:{file:'cupboard-bump.wav',ms:5651},
-    collision:{file:'collision-drivers.wav',ms:7771}
+    collision:{file:'collision-drivers.wav',ms:7771},
+    cityAngryFindHelp:{file:'city/01-angry-find-someone-else.mp3',ms:3200},
+    cityAngrySoon:{file:'city/02-angry-you-said-soon.mp3',ms:3920},
+    cityAngryDoSomething:{file:'city/03-angry-do-something.mp3',ms:3520},
+    cityWinLightsBack:{file:'city/04-win-lights-back-thanks.mp3',ms:5280},
+    cityWinThanks:{file:'city/05-win-thank-you.mp3',ms:3360},
+    cityWinHospital:{file:'city/06-win-hospital-homes.mp3',ms:4240},
+    cityHomeDontRun:{file:'city/07-home-dont-run.mp3',ms:3040},
+    cityHomeCandle:{file:'city/08-home-light-candle.mp3',ms:2720},
+    cityHomeHeat:{file:'city/09-home-air-conditioner.mp3',ms:3040},
+    cityHomeWindow:{file:'city/10-home-open-window.mp3',ms:4400},
+    cityAngryRepairman:{file:'city/11-angry-fault-or-repairman.mp3',ms:4000},
+    cityAngryRegret:{file:'city/12-angry-regret-calling-you.mp3',ms:2960},
+    cityAngryPatience:{file:'city/13-angry-patience.mp3',ms:3440},
+    cityWinContinue:{file:'city/14-win-continue-day.mp3',ms:2960},
+    cityHospitalCare:{file:'city/15-hospital-critical-care.mp3',ms:2640},
+    cityHospitalNursery:{file:'city/16-hospital-nursery.mp3',ms:2880},
+    cityHospitalGenerator:{file:'city/17-hospital-generator.mp3',ms:3600}
   };
   var voiceTrack=null, voiceTimers=[];
+  function setVoicePlaying(on){app.setAttribute('data-voice-playing',on?'true':'false');}
   function clearVoiceTimers(){voiceTimers.forEach(function(id){clearTimeout(id);});voiceTimers=[];}
   function hush(){
     clearVoiceTimers();
     if(voiceTrack){try{voiceTrack.pause();voiceTrack.currentTime=0;}catch(e){} voiceTrack=null;}
+    setVoicePlaying(false);
   }
   function primeVoice(){}
   function playVoice(key,onstart){
     hush();
     var meta=VOICE[key];if(!meta) return;
-    if(!sound){if(onstart) onstart();return;}
+    if(!sound){setVoicePlaying(false);if(onstart) onstart();return;}
     try{
       voiceTrack=new Audio(VOICE_DIR+meta.file);voiceTrack.preload='auto';voiceTrack.volume=1;
-      voiceTrack.addEventListener('play',function(){if(onstart) onstart();},{once:true});
-      voiceTrack.play().catch(function(){if(onstart) onstart();});
-    }catch(e){if(onstart) onstart();}
+      voiceTrack.addEventListener('play',function(){setVoicePlaying(true);if(onstart) onstart();},{once:true});
+      voiceTrack.addEventListener('ended',function(){setVoicePlaying(false);},{once:true});
+      voiceTrack.play().catch(function(){setVoicePlaying(false);if(onstart) onstart();});
+    }catch(e){setVoicePlaying(false);if(onstart) onstart();}
   }
   function powerRise(){
     if(!sound) return;
@@ -494,17 +515,20 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     var W=360,H=250,x=0,speed=1.8/W;
     var src=(srcZone==null)?40+ri(280):srcZone*72+20+ri(32);
     var out='<defs><radialGradient id="gl" cx="50%" cy="100%" r="100%">'+
-      '<stop offset="0" stop-color="#FFC247" stop-opacity=".9"/><stop offset="1" stop-color="#FFC247" stop-opacity="0"/></radialGradient></defs>';
+      '<stop offset="0" stop-color="#FFC247" stop-opacity=".9"/><stop offset="1" stop-color="#FFC247" stop-opacity="0"/></radialGradient></defs>'+
+      '<g class="sky-layer" data-feel-layer="far">';
     for(var s=0;s<26;s++){
       out+='<circle class="st" cx="'+ri(W)+'" cy="'+(4+ri(130))+'" r="'+(Math.random()<0.25?1.3:0.8)+'" style="--d:'+(Math.random()*1.5).toFixed(2)+'s"/>';
     }
     out+='<circle class="halo" cx="76" cy="88" r="66"/><circle class="halo" cx="76" cy="88" r="40"/>'+
       '<circle class="moon" cx="76" cy="88" r="23"/>'+
       '<circle class="crater" cx="68" cy="80" r="4.5"/><circle class="crater" cx="84" cy="94" r="3.2"/><circle class="crater" cx="72" cy="98" r="2.2"/>'+
-      '<ellipse class="cloud" cx="92" cy="100" rx="38" ry="7"/><ellipse class="cloud" cx="250" cy="52" rx="46" ry="8"/>';
+      '<ellipse class="cloud" cx="92" cy="100" rx="38" ry="7"/><ellipse class="cloud" cx="250" cy="52" rx="46" ry="8"/></g>'+
+      '<g class="city-back" data-feel-layer="far">';
     out+='<ellipse class="glow" cx="180" cy="252" rx="230" ry="95" fill="url(#gl)"/>'+
       '<path class="depth-back" d="M0 171l19-23 20 13 20-31 27 22 21-36 25 23 20-18 31 27 22-25 24 18 23-34 28 25 21-16 26 30 33-22v100H0Z"/>'+
-      '<path d="M0 208Q80 190 150 207T360 203v47H0Z" fill="#33375f" opacity=".7"/>';
+      '<path d="M0 208Q80 190 150 207T360 203v47H0Z" fill="#33375f" opacity=".7"/></g>'+
+      '<g class="city-mid" data-feel-layer="mid">';
     while(x<W){
       var w=23+ri(19), h=55+ri(98), z=Math.min(4,Math.floor((x+w/2)/72)), kind=ri(4), by=H-h;
       out+='<path d="M'+(x+w)+' '+by+'l5 7v'+(h-9)+'h-5Z" fill="#0d1437" opacity=".85"/>';
@@ -528,11 +552,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       }
       x+=w+2;
     }
-    out+='<path class="street" d="M0 246h360v4H0Z"/><path class="street-line" d="M0 248h360"/>'+
+    out+='<g class="street-life" data-feel-layer="front"><path class="street" d="M0 246h360v4H0Z"/><path class="street-line" d="M0 248h360"/>'+
       '<path class="tree-trunk" d="M54 244v-17M185 244v-20M290 244v-17"/>'+
       '<circle class="tree-top" cx="54" cy="226" r="9"/><circle class="tree-top" cx="185" cy="220" r="10"/><circle class="tree-top" cx="290" cy="226" r="9"/>'+
       '<g class="traffic"><path d="M-75 239h29l-5-8h-15Z" fill="#d4817b" stroke="#24244d" stroke-width="2"/><circle cx="-68" cy="240" r="3" fill="#171c3c"/><circle cx="-53" cy="240" r="3" fill="#171c3c"/></g>'+
-      '<g class="traffic t2"><path d="M-105 242h25l-4-7h-17Z" fill="#8bbdc1" stroke="#24244d" stroke-width="2"/><circle cx="-99" cy="243" r="3" fill="#171c3c"/><circle cx="-85" cy="243" r="3" fill="#171c3c"/></g>';
+      '<g class="traffic t2"><path d="M-105 242h25l-4-7h-17Z" fill="#8bbdc1" stroke="#24244d" stroke-width="2"/><circle cx="-99" cy="243" r="3" fill="#171c3c"/><circle cx="-85" cy="243" r="3" fill="#171c3c"/></g>'+
+      '<g class="street-people"><circle cx="105" cy="231" r="3"/><path d="M105 234v9m0-6-4 4m4-4 4 4M105 243l-3 5m3-5 3 5"/><circle cx="276" cy="233" r="2.8"/><path d="M276 236v8m0-5-4 3m4-3 4 3M276 244l-3 4m3-4 3 4"/></g></g>';
     if(!L || G.li===0){
     var hx=236, hy=H-98;
     out+='<rect class="b hosp zz z3" x="'+hx+'" y="'+hy+'" width="30" height="98"/>';
@@ -541,16 +566,24 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     }}
     out+='<rect x="'+(hx+3)+'" y="'+(hy+4)+'" width="24" height="12" rx="2" fill="#d9eee7"/><text x="'+(hx+15)+'" y="'+(hy+13)+'" text-anchor="middle" fill="#244a52" font-size="5.8" font-weight="bold">مستشفى</text>';
     out+='<path class="roof" d="M'+(hx-2)+' '+hy+'h34l-4 -7h-26Z"/>'+
-      '<rect x="'+(hx+31)+'" y="'+(H-29)+'" width="20" height="26" rx="2" fill="#3E715F" stroke="#92E6AE" stroke-width="1.4"/>'+
-      '<circle class="hw" cx="'+(hx+41)+'" cy="'+(H-22)+'" r="2"/>'+
+      '<rect class="generator-unit" x="'+(hx+31)+'" y="'+(H-29)+'" width="20" height="26" rx="2" fill="#3E715F" stroke="#92E6AE" stroke-width="1.4"/>'+
+      '<circle class="hw generator-lamp" cx="'+(hx+41)+'" cy="'+(H-22)+'" r="2"/>'+
       '<text x="'+(hx+41)+'" y="'+(H-9)+'" text-anchor="middle" fill="#E7FFEB" font-size="5" font-weight="bold">مولّد</text>'+
       '<text x="'+(hx+15)+'" y="'+(hy-11)+'" text-anchor="middle" fill="#C7FFE0" font-size="7" font-weight="bold">مستشفى</text>';
     }
-    out+='<path class="lamp-post" d="M18 '+H+'v-27q0-6 6-6h4 M122 '+H+'v-20q0-6 6-6h4 M310 '+H+'v-25q0-6 6-6h4"/>'+
+    out+='</g><g class="power-grid" data-feel-layer="play">'+
+      '<path class="power-cable" d="M0 70Q90 59 180 70T360 68M0 76Q90 65 180 76T360 74"/>'+
+      '<path class="power-poles" d="M35 250V63m-9 5h18M181 250V62m-10 7h20M327 250V61m-9 7h18"/>'+
+      '<path class="lamp-post" d="M18 '+H+'v-27q0-6 6-6h4 M122 '+H+'v-20q0-6 6-6h4 M310 '+H+'v-25q0-6 6-6h4"/>'+
       '<circle class="lamp-head" cx="28" cy="'+(H-27)+'" r="3"/><circle class="lamp-head" cx="132" cy="'+(H-20)+'" r="3"/><circle class="lamp-head" cx="320" cy="'+(H-25)+'" r="3"/>';
     out+='<rect class="wire l" x="0" y="'+(H-3)+'" width="'+src+'" height="3" style="--t:'+(src*speed).toFixed(2)+'s"/>';
     out+='<rect class="wire r" x="'+src+'" y="'+(H-3)+'" width="'+(W-src)+'" height="3" style="--t:'+((W-src)*speed).toFixed(2)+'s"/>';
-    out+='<circle class="spark" cx="'+src+'" cy="'+(H-3)+'" r="5"/>';
+    out+='<circle class="spark" cx="'+src+'" cy="'+(H-3)+'" r="5"/></g>'+
+      '<g class="city-front" data-feel-layer="front">'+
+      '<path class="roof-details" d="M14 199h18v-8h9v8h17M286 193h13v-12h16v12h17"/>'+
+      '<path class="satellite" d="M30 197q11-13 21-2q-9 5-21 2m10-1 5 8M303 189q10-12 18-2q-8 5-18 2m9-1 4 8"/>'+
+      '<g class="water-tank"><rect x="330" y="177" width="19" height="24" rx="6"/><path d="M333 201v8m13-8v8M329 209h21"/></g>'+
+      '<g class="street-kiosk"><path d="M145 226h29v20h-29Z"/><path d="M141 226h37l-5-8h-27Z"/><rect x="150" y="231" width="8" height="7"/><rect x="161" y="231" width="8" height="7"/></g></g>';
     for(var f=0;f<3;f++){
       var cx=60+f*110+ri(40), cy=45+ri(45), g='';
       for(var k=0;k<12;k++){var a=k*Math.PI/6;g+='<circle cx="'+(cx+Math.cos(a)*22).toFixed(1)+'" cy="'+(cy+Math.sin(a)*22).toFixed(1)+'" r="1.7"/>';}
@@ -565,33 +598,55 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
         '<path d="M0,-1 L-1.2,-3 L-1.6,-1 C-4,-4.5 -8,-4.5 -11,-2 C-9,-1.6 -8.5,0 -9,2 C-7.5,0.6 -6,0.8 -5,2.4 C-4,1 -2.5,1.2 -1.5,2.6 L0,4 L1.5,2.6 C2.5,1.2 4,1 5,2.4 C6,0.8 7.5,0.6 9,2 C8.5,0 9,-1.6 11,-2 C8,-4.5 4,-4.5 1.6,-1 L1.2,-3 Z"/>'+
         '<circle class="eye" cx="-0.8" cy="-0.6" r="0.45"/><circle class="eye" cx="0.8" cy="-0.6" r="0.45"/></g></g></g>';
     }
-    out+='<g class="bats">'+bats+'</g>';
+    out+='<g class="bats" data-feel-layer="far">'+bats+'</g>';
     var zs='';
     for(var q=0;q<5;q++){
       if(q) zs+='<line class="zsep" x1="'+(q*72)+'" y1="120" x2="'+(q*72)+'" y2="'+H+'"/>';
       zs+='<text class="zl" x="'+(q*72+36)+'" y="'+(H-8)+'" text-anchor="middle">'+ZNAMES[4-q]+'</text>';
       zs+='<rect class="zone" data-z="'+q+'" x="'+(q*72)+'" y="0" width="72" height="'+H+'"/>';
     }
-    out+='<g class="zones">'+zs+'</g>';
+    out+='<g class="zones" data-feel-layer="play">'+zs+'</g>';
     sky.innerHTML=out;
   }
 
   function drawShop(){
-    var out='<defs><linearGradient id="shopbg" x2="0" y2="1"><stop stop-color="#393A79"/><stop offset="1" stop-color="#B37C80"/></linearGradient></defs>'+
-      '<rect width="360" height="250" fill="url(#shopbg)"/>'+
-      '<circle cx="65" cy="63" r="28" fill="#FFE5A2" opacity=".9"/>'+
-      '<path d="M0 170h360v80H0Z" fill="#474675"/><path d="M0 218h360" stroke="#DBBDA1" stroke-width="2" stroke-dasharray="20 13"/>';
+    var out='<defs>'+ 
+      '<linearGradient id="shopbg" x2="0" y2="1"><stop stop-color="#242957"/><stop offset=".58" stop-color="#6B557B"/><stop offset="1" stop-color="#D08A73"/></linearGradient>'+ 
+      '<linearGradient id="shoproad" x2="0" y2="1"><stop stop-color="#55537D"/><stop offset="1" stop-color="#2D345E"/></linearGradient>'+ 
+      '<filter id="shopglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+ 
+      '</defs>'+ 
+      '<g class="shop-sky" data-feel-layer="far"><rect width="360" height="250" fill="url(#shopbg)"/>'+ 
+      '<circle cx="65" cy="57" r="25" fill="#FFE5A2" opacity=".88"/><circle cx="58" cy="51" r="3" fill="#D7BFA3" opacity=".45"/>'+ 
+      '<path d="M0 112l38-25 31 13 37-37 44 32 38-50 46 51 36-22 34 25 56-32v105H0Z" fill="#292B58" opacity=".72"/>'+ 
+      '<path class="shop-cloud-one" d="M-30 48q34-13 71-2t59 0q-31 11-68 9T-30 48Z" fill="#202349" opacity=".45"/>'+ 
+      '<path class="shop-cloud-two" d="M238 72q25-10 51-1t48 0q-23 9-52 7t-47-6Z" fill="#25264F" opacity=".42"/></g>'+ 
+      '<g class="shop-lights" data-feel-layer="mid"><path d="M4 76q88 24 176 0t176 0" fill="none" stroke="#343963" stroke-width="2"/>';
+    for(var l=0;l<12;l++){
+      var lx=11+l*31,ly=78+Math.round(Math.sin(l*.82)*8);
+      out+='<path d="M'+lx+' '+(ly-6)+'v8" stroke="#343963" stroke-width="1.5"/><circle class="shop-bulb" cx="'+lx+'" cy="'+(ly+4)+'" r="2.6" fill="'+(l%3===0?'#FF9FA6':l%3===1?'#FFE38A':'#8DE1D0')+'"/>';
+    }
+    out+='</g><g class="shop-floor" data-feel-layer="front"><path d="M0 166h360v84H0Z" fill="url(#shoproad)"/><path d="M0 217h360" stroke="#E1C9A2" stroke-width="2" stroke-dasharray="20 13"/>'+ 
+      '<path d="M0 172h360" stroke="#A9A1BD" stroke-width="3"/><path d="M0 239h360" stroke="#151B40" stroke-width="8" opacity=".65"/></g>'+ 
+      '<g class="shop-fronts" data-feel-layer="play">';
     for(var i=0;i<4;i++){
       var x=9+i*87;
-      out+='<rect x="'+x+'" y="93" width="79" height="112" rx="5" fill="'+(['#8BC9C3','#E9AF8D','#B5A8D5','#C2A8CC'][i])+'" stroke="#343668" stroke-width="4"/>'+
+      out+='<g class="shop-branch shop-branch-'+i+'"><ellipse cx="'+(x+39)+'" cy="203" rx="38" ry="5" fill="#141B40" opacity=".36"/>'+ 
+        '<rect x="'+x+'" y="93" width="79" height="112" rx="5" fill="'+(['#8BC9C3','#E9AF8D','#B5A8D5','#C2A8CC'][i])+'" stroke="#343668" stroke-width="4"/>'+ 
         '<path d="M'+(x-3)+' 112h85v19q-9 8-17 0-9 8-17 0-9 8-17 0-9 8-17 0-9 8-17 0Z" fill="'+(['#F9D46E','#E9858C','#77CAC0','#B7DA7A'][i])+'" stroke="#363566" stroke-width="3"/>'+
-        '<rect x="'+(x+8)+'" y="145" width="39" height="50" fill="#51608F" stroke="#303C70" stroke-width="3"/>'+
+        '<rect class="shop-window" x="'+(x+8)+'" y="145" width="39" height="50" fill="#51608F" stroke="#303C70" stroke-width="3"/>'+ 
+        '<path d="M'+(x+12)+' 180h31M'+(x+20)+' 149v42" stroke="#91BED0" stroke-width="1.5" opacity=".7"/>'+ 
+        '<rect x="'+(x+15)+'" y="157" width="23" height="13" rx="2" fill="#9FB4C8"/><path d="M'+(x+18)+' 173h17" stroke="#F0D7A2" stroke-width="2"/>'+ 
         '<rect x="'+(x+54)+'" y="145" width="16" height="60" fill="#69567D" stroke="#303C70" stroke-width="3"/>'+
         '<rect x="'+(x+4)+'" y="101" width="71" height="16" rx="4" fill="#3B3E78"/>'+
-        '<text x="'+(x+39)+'" y="113" text-anchor="middle" fill="#FFF0C0" font-size="8" font-weight="bold">'+BRANCH[i][0]+'</text>';
+        '<text x="'+(x+39)+'" y="113" text-anchor="middle" fill="#FFF0C0" font-size="8" font-weight="bold">'+BRANCH[i][0]+'</text>'+ 
+        '<circle class="shop-sign-light" cx="'+(x+68)+'" cy="106" r="2" fill="#8FF0BE" filter="url(#shopglow)"/></g>';
     }
-    out+='<path d="M0 205h360" stroke="#303A6B" stroke-width="5"/><circle cx="178" cy="213" r="13" fill="#FFD46B" stroke="#414177" stroke-width="3"/>'+
-      '<text x="178" y="217" text-anchor="middle" fill="#473766" font-size="12" font-weight="bold">؟</text>';
+    out+='</g><g class="shop-activity" data-feel-layer="front">'+ 
+      '<g class="shop-customer customer-one"><circle cx="48" cy="197" r="5" fill="#C6886A"/><path d="M48 202v18m-8-11 8-5 8 5m-8 11-7 12m7-12 7 12" stroke="#26305A" stroke-width="4" stroke-linecap="round" fill="none"/></g>'+ 
+      '<g class="shop-customer customer-two"><circle cx="294" cy="196" r="5" fill="#A86D58"/><path d="M294 201v19m-8-10 8-6 9 6m-9 10-7 12m7-12 8 12" stroke="#5A3664" stroke-width="4" stroke-linecap="round" fill="none"/></g>'+ 
+      '<g class="shop-scooter"><path d="M118 226h33l10-12h17" stroke="#E98D78" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="125" cy="229" r="6" fill="#171D42" stroke="#9DA7C4" stroke-width="2"/><circle cx="168" cy="229" r="6" fill="#171D42" stroke="#9DA7C4" stroke-width="2"/><rect x="139" y="208" width="17" height="13" rx="2" fill="#E6B565"/></g>'+ 
+      '</g><g class="shop-mystery" data-feel-layer="front"><circle cx="218" cy="219" r="14" fill="#FFD46B" stroke="#414177" stroke-width="3" filter="url(#shopglow)"/>'+ 
+      '<text x="218" y="224" text-anchor="middle" fill="#473766" font-size="14" font-weight="bold">؟</text></g>';
     sky.innerHTML=out;
   }
 
@@ -844,7 +899,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     timerEl.hidden=!show;
     if(!show){stage.classList.remove('hot');return;}
     var r=Math.max(0,remMs()), s=Math.ceil(r/1000), hot=!!S.deadline&&s<=10;
-    tlabel.textContent=L.city?'وقود مولّد المستشفى':'الوقت الباقي';
+    tlabel.textContent=L.city?'الوقت الباقي قبل ما يفصل المولّد':'الوقت الباقي';
     tfill.style.width=(r/(L.time*1000)*100)+'%';
     tnum.textContent=s;
     timerEl.classList.toggle('hot',hot);
@@ -853,6 +908,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function lose(reason){
     G.view='lost';S.why=reason;hush();bubble.hidden=true;sfx('lose');
+    if(L&&L.city){
+      var o=pick(CITY_LOSE_LINES);
+      voiceTimers.push(setTimeout(function(){
+        playVoice(o.audio,function(){showBubble(o,false,VOICE[o.audio].ms);});
+      },350));
+    }
   }
   setInterval(function(){
     if(!inPlay()||!race()) return;
@@ -877,7 +938,20 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'جار في الضلمة',role:'neighbor',t:'آآه! اتخبطت في الدولاب! منه لله اللي قطع النور!',audio:'cupboard',fx:'thud'},
       {who:'عامل',role:'worker',t:'وردية كاملة راحت علينا، وبكرة يقولوا الشغل اتأخر ليه.',audio:'factoryWorker'},
       {who:'صاحبة الورشة',role:'factory',t:'المكن واقف والشغل متراكم. يا رب النور يرجع.',audio:'factoryOwner'},
-      {who:'حارس البوابة',role:'guard',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'}
+      {who:'حارس البوابة',role:'guard',t:'الشارع ضلمة خالص. اللي داخل ياخد باله من نفسه.',audio:'factoryGuard'},
+      {who:'راجل من الشارع',role:'angryResident',t:'يا باشا، لو مش عارف قول لنا نشوف حد تاني.',audio:'cityAngryFindHelp'},
+      {who:'واحد من السكان',role:'angryResident',t:'يا معلم، كل شوية تقول قربنا… قربنا دي بقالها ساعة.',audio:'cityAngrySoon'},
+      {who:'صاحب محل',role:'shopkeeper',t:'يا عم النور مش هيرجع لوحده، اعمل لنا أي حاجة.',audio:'cityAngryDoSomething'},
+      {who:'أم من العمارة',role:'mother',t:'يا بنتي بلاش تجري، هتخبطي في الترابيزة.',audio:'cityHomeDontRun'},
+      {who:'أم ياسين',role:'mother',t:'يا ابني ولّع الشمعة اللي في الدرج، بسرعة.',audio:'cityHomeCandle'},
+      {who:'أبو ياسين',role:'father',t:'التكييف فصل والعرق جاب آخره.',audio:'cityHomeHeat'},
+      {who:'أبو ياسين',role:'father',t:'يا ابني، سيب الشباك مفتوح… مفيش نَفَس في البيت!',audio:'cityHomeWindow'},
+      {who:'راجل متعصب',role:'angryResident',t:'يا عم هو العطل في الكهربا ولا في اللي بيصلّحها؟',audio:'cityAngryRepairman'},
+      {who:'واحد من السكان',role:'angryResident',t:'يا عم، ما تخلّيناش نندم إننا ندهنا عليك.',audio:'cityAngryRegret'},
+      {who:'جار زهقان',role:'elder',t:'ربنا يصبّرنا عليك… وعلى الكهربا.',audio:'cityAngryPatience'},
+      {who:'دكتور المستشفى',role:'doctor',t:'خلي حد واقف جنب جهاز الرعاية، احتياطي.',audio:'cityHospitalCare'},
+      {who:'مشرفة التمريض',role:'nurseLead',t:'يا تمريض، حد يطمن على الأطفال في الحضّانة.',audio:'cityHospitalNursery'},
+      {who:'فني المستشفى',role:'hospitalTech',t:'المستشفى على المولّد، خلّصوا الموضوع قبل ما يبقى فيه مصيبة.',audio:'cityHospitalGenerator'}
     ],
     business:[
       {who:'صاحب المحل',role:'shopkeeper',t:'يا خسارة، اليوم قرب يخلص ولسه الدنيا هادية.'},
@@ -885,6 +959,20 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'موظفة المحل',role:'cashier',t:'يا نهار أبيض، اليوم ده مش راضي يعدّي.'}
     ]
   };
+  var CITY_LOSE_LINES=[
+    {who:'راجل من الشارع',role:'angryResident',t:'يا باشا، لو مش عارف قول لنا نشوف حد تاني.',audio:'cityAngryFindHelp'},
+    {who:'واحد من السكان',role:'angryResident',t:'يا معلم، كل شوية تقول قربنا… قربنا دي بقالها ساعة.',audio:'cityAngrySoon'},
+    {who:'صاحب محل',role:'shopkeeper',t:'يا عم النور مش هيرجع لوحده، اعمل لنا أي حاجة.',audio:'cityAngryDoSomething'},
+    {who:'راجل متعصب',role:'angryResident',t:'يا عم هو العطل في الكهربا ولا في اللي بيصلّحها؟',audio:'cityAngryRepairman'},
+    {who:'واحد من السكان',role:'angryResident',t:'يا عم، ما تخلّيناش نندم إننا ندهنا عليك.',audio:'cityAngryRegret'},
+    {who:'جار زهقان',role:'elder',t:'ربنا يصبّرنا عليك… وعلى الكهربا.',audio:'cityAngryPatience'}
+  ];
+  var CITY_WIN_LINES=[
+    {who:'أم ياسين',role:'mother',t:'أهو رجع! الحمد لله يا رب! تسلم إيدك يا باشا، ربنا يفتحها في وشك.',audio:'cityWinLightsBack'},
+    {who:'واحدة من السكان',role:'mother',t:'تسلم إيدك يا باشا، ربنا يفتحها في وشك.',audio:'cityWinThanks'},
+    {who:'مشرفة التمريض',role:'nurseLead',t:'ربنا يجازيك خير، المستشفى والبيوت رجعوا يتنفسوا.',audio:'cityWinHospital'},
+    {who:'أم من العمارة',role:'mother',t:'كده نعرف نكمل يومنا بقى، كتر خيرك.',audio:'cityWinContinue'}
+  ];
   var BAG={key:'',q:[],last:null};
   function nextLine(){
     var key=(L&&!L.city)?'business':'city', pool=EXTRA_LINES[key];
@@ -909,6 +997,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     cashier:{f:1,shirt:'#e78bab',skin:'#c98263',hair:'#4a2f3f',long:1},
     nurse:{f:1,shirt:'#6bc8ba',skin:'#d39470',hijab:'#f2f6fb'},
     doctor:{f:0,shirt:'#f7fbff',skin:'#c98263',hair:'#2b2d4a',glasses:1},
+    femaleDoctor:{f:1,shirt:'#f7fbff',skin:'#d39470',hijab:'#54749a',coat:1,stethoscope:1,badge:1,mood:'serious'},
+    nurseLead:{f:1,shirt:'#5fc5b8',skin:'#c98263',hijab:'#edf6f7',stethoscope:1,badge:1,mood:'worried'},
+    hospitalTech:{f:0,shirt:'#3f6f82',skin:'#a86a4c',hair:'#242844',vest:1,badge:1,mood:'worried'},
+    angryResident:{f:0,shirt:'#a35f4f',skin:'#b97455',hair:'#282941',stache:'#282941',mood:'angry'},
+    father:{f:0,shirt:'#527da1',skin:'#c98263',hair:'#30345a',stache:'#30345a',collar:1,mood:'tired'},
     elder:{f:0,shirt:'#8a7a5c',skin:'#b97455',hair:'#c9c9d6',stache:'#d8d8e2',glasses:1},
     neighbor:{f:0,shirt:'#6d8f6a',skin:'#c98263',hair:'#30345a'},
     shopkeeper:{f:0,shirt:'#4f7fa8',skin:'#b97455',hair:'#2a2440',stache:'#2a2440',apron:1},
@@ -918,12 +1011,15 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     driver2:{f:0,shirt:'#4fa38f',skin:'#a86a4c',hair:'#1f2238',stache:'#1f2238',glasses:1}
   };
   function characterSvg(role){
-    var c=CHAR[role]||CHAR.neighbor, o='<svg viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+    var c=CHAR[role]||CHAR.neighbor, o='<svg class="character-svg mood-'+(c.mood||'neutral')+'" viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
       '<ellipse cx="61" cy="150" rx="43" ry="5" fill="#080e30" opacity=".3"/>';
     if(c.long) o+='<path d="M27 50Q22 100 34 112h54q12-12 7-62Z" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
     if(c.hijab) o+='<path d="M22 60Q20 14 61 12Q102 14 100 60Q104 104 82 110H40Q18 104 22 60Z" fill="'+c.hijab+'" stroke="#29315d" stroke-width="5"/>';
-    o+='<path d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+c.shirt+'" stroke="#29315d" stroke-width="5"/>';
+    o+='<path class="character-body" d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+c.shirt+'" stroke="#29315d" stroke-width="5"/>';
     if(c.apron) o+='<path d="M44 108h34v47H44Z" fill="#f2ead8" stroke="#29315d" stroke-width="3"/>';
+    if(c.vest) o+='<path d="M30 112h20l11 14 11-14h20l8 43H22Z" fill="#f0a84f" stroke="#29315d" stroke-width="3"/><path d="M31 128h60M39 112v43M83 112v43" stroke="#ffe099" stroke-width="3" opacity=".9"/>';
+    if(c.coat) o+='<path d="M25 109h27l9 17 10-17h27l9 46H15Z" fill="#f7fbff" stroke="#29315d" stroke-width="3"/><path d="M52 109l9 17 10-17M61 126v29" fill="none" stroke="#9eb1c7" stroke-width="2.5"/>';
+    if(c.collar) o+='<path d="M45 105l16 15 17-15" fill="none" stroke="#c8d9e7" stroke-width="4"/>';
     if(c.f&&!c.hijab) o+='<path d="M50 104l11 12 11-12" fill="none" stroke="#fff3" stroke-width="3"/>';
     o+=c.hijab?'<ellipse cx="61" cy="60" rx="27" ry="33" fill="'+c.skin+'" stroke="#29315d" stroke-width="4"/>'
       :'<ellipse cx="61" cy="58" rx="'+(c.f?30:33)+'" ry="39" fill="'+c.skin+'" stroke="#29315d" stroke-width="5"/>';
@@ -933,16 +1029,24 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       if(c.bun) o+='<circle cx="61" cy="9" r="11" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
     }
     // eyes
-    if(c.f) o+='<path d="M42 56l4-3M80 56l-4-3" stroke="#283059" stroke-width="2.5" stroke-linecap="round"/>';
+    o+='<g class="character-eyes">';
+    if(c.mood==='angry') o+='<path d="M39 50l15 5M70 55l15-5" stroke="#283059" stroke-width="4" stroke-linecap="round"/>';
+    else if(c.mood==='worried'||c.mood==='tired') o+='<path d="M39 55l15-4M70 51l15 4" stroke="#283059" stroke-width="3" stroke-linecap="round"/>';
+    else if(c.f) o+='<path d="M42 56l4-3M80 56l-4-3" stroke="#283059" stroke-width="2.5" stroke-linecap="round"/>';
     else o+='<path d="M40 52h14M70 52h14" stroke="'+(c.hair||'#283059')+'" stroke-width="4" stroke-linecap="round"/>';
     o+='<ellipse cx="48" cy="62" rx="3.5" ry="4.7" fill="#283059"/><ellipse cx="76" cy="62" rx="3.5" ry="4.7" fill="#283059"/>';
     if(c.glasses) o+='<circle cx="48" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><circle cx="76" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><path d="M57 62h10" stroke="#29315d" stroke-width="3"/>';
-    if(c.f) o+='<ellipse cx="40" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/><ellipse cx="82" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/>'+
-      '<path d="M52 83q9 7 18 0" fill="#c4566b" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>';
-    else o+='<path d="M51 86q10 6 22 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
+    o+='</g>';
+    if(c.mood==='angry') o+='<path class="character-mouth" d="M50 88q11-9 23 0" fill="none" stroke="#6b3a45" stroke-width="4" stroke-linecap="round"/>';
+    else if(c.mood==='worried'||c.mood==='tired'||c.mood==='serious') o+='<path class="character-mouth" d="M51 87q10-5 21 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
+    else if(c.f) o+='<ellipse cx="40" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/><ellipse cx="82" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/>'+
+      '<path class="character-mouth" d="M52 83q9 7 18 0" fill="#c4566b" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>';
+    else o+='<path class="character-mouth" d="M51 86q10 6 22 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
     if(c.stache) o+='<path d="M47 78q14-8 28 0q-14 4-28 0Z" fill="'+c.stache+'" stroke="#24234d" stroke-width="2"/>';
     if(c.helmet) o+='<path d="M23 37Q25 9 60 9q35 0 37 28Z" fill="#ffd459" stroke="#29315d" stroke-width="4"/><path d="M19 38h82v8H19Z" fill="#f5ad4c" stroke="#29315d" stroke-width="3"/>';
     if(c.cap) o+='<path d="M27 38Q28 12 61 12Q94 12 95 38Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="4"/><path d="M60 36h48l-4 8H60Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="3"/>';
+    if(c.stethoscope) o+='<path d="M45 112q0 21 16 21t17-21M61 133v8" fill="none" stroke="#29315d" stroke-width="3"/><circle cx="61" cy="144" r="5" fill="#98c8cf" stroke="#29315d" stroke-width="3"/>';
+    if(c.badge) o+='<rect x="76" y="116" width="17" height="12" rx="2" fill="#f4f7ff" stroke="#29315d" stroke-width="2"/><path d="M80 121h9" stroke="#5a6f94" stroke-width="2"/>';
     return o+'</svg>';
   }
   var DR={i:0,next:0,hide:0,fast:0};
@@ -951,7 +1055,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     bubble.innerHTML=(o.who?'<strong class="speaker">'+esc(o.who)+'</strong>':'')+'<span class="speech">'+words+'</span>';
     bubble.className='bubble'+(o.tr?' tr':'')+(joyful?' joy':'');
     bubble.style.left=o.left||'5%';bubble.style.right=o.right||'auto';bubble.style.bottom=o.bottom||'42%';
-    actor.innerHTML=characterSvg(o.role||'worker');actor.dataset.role=o.role||'worker';actor.className='actor'+(o.tr?' right':'');actor.hidden=false;
+    actor.innerHTML=characterSvg(o.role||'worker');actor.dataset.role=o.role||'worker';actor.className='actor'+(o.tr?' right':'')+(joyful?' joyful':'');actor.hidden=false;
     bubble.hidden=false;DR.hide=Date.now()+(ms||5000);
   }
   function playCollision(){
@@ -1047,11 +1151,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function pips(){
     var h='';
     for(var i=0;i<L.budget;i++){h+='<span class="pip'+(i<left()?' left':'')+'"></span>';}
-    return '<div class="bar"><span>تفكيكات باقية: '+Math.max(0,left())+'</span><span class="pips" aria-hidden="true">'+h+'</span></div>';
+    return '<div class="bar breaker-hud"><span>تفكيكات باقية: '+Math.max(0,left())+'</span><span class="pips breaker-rail" aria-hidden="true">'+h+'</span></div>';
   }
   function crumbs(){
     if(S.path.length<2) return '';
-    var h='<nav class="crumbs" aria-label="مكانك في التفكيك">';
+    var h='<nav class="crumbs power-route" aria-label="مكانك في التفكيك">';
     S.path.forEach(function(n,i){
       if(i) h+='<span class="sep">‹</span>';
       if(i<S.path.length-1) h+='<button data-act="up" data-i="'+i+'">'+esc(n.name)+'</button>';
@@ -1067,10 +1171,10 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function panel(n){
     var title=n.kind==='dim'?L.rootName+' مفككة '+n.name:n.name;
-    return '<section class="panel"><h2>'+esc(title)+'</h2><div class="figs">'+
+    return '<section class="panel gauge-panel"><h2>'+esc(title)+'</h2><div class="figs">'+
       '<span class="now">'+fmt(n.actual)+'</span>'+
       '<span class="usual">المعتاد '+fmt(n.normal)+'</span>'+diffHtml(n)+
-      '</div><div class="unit">'+L.unit+'</div></section>';
+      '</div><div class="unit">وحدة القياس: '+L.unit+'</div></section>';
   }
   function tile(c,i){
     var cls='tile', tag='', dis='';
@@ -1092,10 +1196,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     var lock=!G.learned;
     return '<section class="panel mt"><h2>مستشفى المدينة على المولّد</h2>'+
       '<p>الكهربا قطعت عن المدينة كلها. مهمتك تلاقي السبب بالتحليل، والتحليل معناه التفكيك: تاخد الرقم العام وتقسّمه لحد ما السبب يبان.</p>'+
-      '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+
+      '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+ 
+      '<p class="say note tutorial-note">ابدأ من الرقم العام، قارنه بالمعتاد، وبعدها فكّكه خطوة خطوة. كل اختيار بيقرّبك من مكان المشكلة أو يرجّعك خطوة للمراجعة.</p>'+ 
       (lock?'<button class="btn" data-act="mode" data-m="learn">وضع التعلّم: من غير عدّاد</button>'+
-        '<button class="btn ghost" data-act="mode" data-m="race" disabled>وضع التحدي: عدّاد ولوحة ترتيب</button>'
-       :'<button class="btn" data-act="mode" data-m="race">وضع التحدي: عدّاد ولوحة ترتيب</button>')+
+        '<button class="btn ghost" data-act="mode" data-m="race" disabled>وضع التحدي: بعدّاد</button>'
+       :'<button class="btn" data-act="mode" data-m="race">وضع التحدي: بعدّاد</button>')+
       (lock?'<p class="say note">وضع التحدي بيتفتح بعد ما تخلّص وضع التعلّم.</p>':'')+'</section>';
   }
 
@@ -1130,6 +1235,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       }else{
         h+='<p class="say note">قارن كل رقم بالمعتاد بتاعه، ودوس على اللي عايز تفكّكه'+(kids[0].zone!=null?'. تقدر كمان تدوس على الحي في صورة المدينة':'')+'.</p>';
       }
+      if(S.good) h+='<p class="say note next-step">السبب اتصلّح، لكن المهمة لسه مستمرة. ارجع خطوة وكمل البحث عن باقي الاختلاف.</p>';
       h+='<div class="grid">'+kids.map(tile).join('')+'</div>';
       if(kids[0].inert) h+='<button class="btn" data-act="up" data-i="0">ارجع للأدلة وجرّب بُعد تاني</button>';
     }
@@ -1155,11 +1261,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function renderWon(){
     var last=G.li===NL-1, h='<section class="panel mt"><h2>'+(L.city?'المدينة نوّرت':'المبيعات رجعت')+'</h2>'+
-      starsHtml(G.stars[G.li])+'<div class="pts">'+fmt(G.pts[G.li])+' نقطة</div>'+
+      starsHtml(G.stars[G.li])+'<div class="pts">'+fmt(G.pts[G.li])+' نقطة</div>'+ 
       '<p>'+S.used+' تفكيكات (أقل عدد ممكن '+L.opt+')'+(race()?'، وفاضل '+S.secLeft+' ثانية':'')+'.</p><ul class="found">';
     S.fixed.forEach(function(f){h+='<li>'+esc(f.where)+': '+esc(f.cause)+'.</li>';});
     h+='</ul><p class="lesson">'+esc(L.lesson)+'</p>'+
-      '<button class="btn" data-act="next">'+(last?(race()?'شوف نتيجتك':(FEAT.reflect?'آخر خطوة: اكتب القاعدة بكلامك':'خلّصت وضع التعلّم')):'المهمة اللي بعدها')+'</button></section>';
+      '<button class="btn" data-act="next">'+(last?'آخر خطوة: اكتب القاعدة بكلامك':'المهمة اللي بعدها')+'</button></section>';
     return h;
   }
   function renderLost(){
@@ -1272,7 +1378,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     G.view='won';
     hush();
     if(L.city){
-      showBubble({t:'النور جه! الحمد لله!',left:'30%',bottom:'50%'},true);
+      var o=pick(CITY_WIN_LINES);
+      playVoice(o.audio,function(){showBubble(o,true,VOICE[o.audio].ms);});
     }else bubble.hidden=true;
     sfx('win');
   }
@@ -1338,11 +1445,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     if(act==='mode'){G.mode=b.getAttribute('data-m');G.pts=[0,0,0,0];G.stars=[0,0,0,0];startLevel(0);return;}
     if(act==='next'){
       if(G.li<NL-1){startLevel(G.li+1);return;}
-      if(race()){
-        var total=G.pts.reduce(function(a,c){return a+c;},0);
-        store('dc_best',String(Math.max(total,+store('dc_best')||0)));
-        B.saved=false;B.err=false;G.view='board';loadBoard();
-      }else{G.view='reflect';G.compared=false;G.answer='';}
+      G.view='reflect';G.compared=false;G.answer='';
       render();window.scrollTo({top:0,behavior:'smooth'});return;
     }
     if(act==='retry'){startLevel(G.li);return;}
@@ -1377,5 +1480,6 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   render();
 })();
 </script>
+<script src="game-feel.js"></script>
 </body>
 </html>

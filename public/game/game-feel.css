@@ -1,0 +1,564 @@
+:root{
+  --feel-ease-out:cubic-bezier(.22,1,.36,1);
+  --feel-ease-snap:cubic-bezier(.2,.9,.25,1.25);
+  --feel-fast:160ms;
+  --feel-medium:360ms;
+  --feel-slow:900ms;
+  --feel-depth-far:0;
+  --feel-depth-mid:1;
+  --feel-depth-play:2;
+  --feel-depth-character:3;
+  --feel-depth-front:4;
+  --feel-glow:#ffd76d;
+  --feel-danger:#ff7468;
+}
+
+.stage[data-feel-ready="true"]{
+  isolation:isolate;
+  transform:translateZ(0);
+}
+
+.stage [data-feel-layer]{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+.stage [data-feel-layer="far"]{z-index:var(--feel-depth-far)}
+.stage [data-feel-layer="mid"]{z-index:var(--feel-depth-mid)}
+.stage [data-feel-layer="play"]{z-index:var(--feel-depth-play)}
+.stage [data-feel-layer="character"]{z-index:var(--feel-depth-character)}
+.stage [data-feel-layer="front"]{z-index:var(--feel-depth-front)}
+
+.sky-layer,.city-back,.city-mid,.street-life,.power-grid,.city-front,.bats{
+  pointer-events:none;
+}
+
+.zones{pointer-events:auto}
+
+.sky-layer{
+  animation:feel-sky-drift 18s ease-in-out infinite alternate;
+  transform-origin:50% 40%;
+}
+
+.city-back{
+  animation:feel-horizon-breathe 11s ease-in-out infinite alternate;
+  transform-origin:50% 100%;
+}
+
+.city-mid{filter:drop-shadow(0 5px 7px #02061766)}
+.street-life{filter:drop-shadow(0 -2px 3px #05091f55)}
+.city-front{filter:drop-shadow(0 3px 2px #02051688)}
+.power-grid{opacity:.58;filter:drop-shadow(0 0 2px #7d8bc066)}
+.power-cable,.power-poles{fill:none;stroke:#7c85a9;stroke-width:1.2;opacity:.52}
+.power-poles{stroke-width:1.8}
+.street-people{fill:#1a2146;stroke:#1a2146;stroke-width:1.4;stroke-linecap:round}
+.roof-details,.satellite,.water-tank,.street-kiosk{fill:#171d42;stroke:#626c99;stroke-width:1.3;stroke-linejoin:round}
+.street-kiosk rect{fill:#29325e;stroke:#6976a6;stroke-width:.8}
+.generator-unit{filter:drop-shadow(0 0 4px #77e8a088)}
+.generator-lamp{animation:feel-generator-pulse 1.5s ease-in-out infinite}
+.bats{filter:drop-shadow(0 2px 2px #02030c99)}
+
+.stage::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  z-index:8;
+}
+
+.app.feel-wrong .stage{animation:feel-scene-jolt 320ms var(--feel-ease-out)}
+.app.feel-wrong .stage::after{animation:feel-wrong-flash 420ms ease-out}
+.app.feel-fix .power-grid{animation:feel-grid-confirm 720ms var(--feel-ease-out)}
+.app.feel-fix .spark{animation:feel-fix-spark 720ms var(--feel-ease-snap)}
+.app.feel-fix .stage::after{animation:feel-fix-wave 720ms var(--feel-ease-out)}
+.app.feel-win .stage::after{animation:feel-win-wash 1.6s var(--feel-ease-out)}
+.app.feel-win .city-mid{animation:feel-city-rise 1.1s var(--feel-ease-out)}
+.app.feel-loss .stage{animation:feel-loss-settle 1.45s var(--feel-ease-out)}
+.app.feel-loss .stage::after{animation:feel-loss-vignette 1.45s var(--feel-ease-out) forwards}
+.app[data-feel-pressure="critical"] .timer{
+  filter:drop-shadow(0 0 8px color-mix(in srgb,var(--feel-danger) 55%,transparent));
+}
+
+.actor:not([hidden]) .character-svg{
+  transform-box:fill-box;
+  transform-origin:50% 100%;
+  animation:feel-character-breathe 2.8s ease-in-out infinite;
+}
+
+.character-eyes{
+  transform-box:fill-box;
+  transform-origin:50% 55%;
+  animation:feel-character-blink 5.2s steps(1,end) infinite;
+}
+
+.character-body,.character-mouth{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+.app[data-voice-playing="true"] .character-mouth{
+  animation:feel-mouth-talk 170ms ease-in-out infinite alternate;
+}
+
+.mood-angry .character-body{animation:feel-angry-posture 650ms ease-in-out infinite alternate}
+.mood-worried .character-body,.mood-tired .character-body{animation:feel-worried-posture 1.8s ease-in-out infinite alternate}
+.actor.joyful .character-svg{animation:feel-character-celebrate 640ms var(--feel-ease-snap) infinite alternate}
+
+/* The existing gameplay HUD reads as a small electricity control board. */
+.breaker-hud{
+  position:relative;
+  overflow:hidden;
+  border-color:#8294c5;
+  background:
+    linear-gradient(110deg,#26366f 0 48%,#1a275a 48% 52%,#26366f 52% 100%);
+  box-shadow:inset 0 1px 0 #ffffff20,0 5px 0 #10183d,0 10px 20px #0b12332b;
+}
+.breaker-hud::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid #aebbe83c;
+  border-radius:8px;
+  pointer-events:none;
+}
+.breaker-hud>span:first-child{position:relative;z-index:1;font-weight:800;letter-spacing:.01em}
+.breaker-rail{
+  position:relative;
+  z-index:1;
+  align-items:center;
+  gap:6px;
+  padding:5px 7px;
+  border:1px solid #7987b8;
+  border-radius:8px;
+  background:#111a43;
+  box-shadow:inset 0 2px 5px #060b24aa;
+}
+.breaker-rail .pip{
+  position:relative;
+  width:12px;
+  height:20px;
+  border-radius:4px;
+  border-color:#5e6c98;
+  background:linear-gradient(#26345f,#152045);
+  box-shadow:inset 0 1px 2px #ffffff14;
+  transform:translateY(1px);
+}
+.breaker-rail .pip::after{
+  content:"";
+  position:absolute;
+  inset:3px 2px auto;
+  height:3px;
+  border-radius:3px;
+  background:#6876a4;
+}
+.breaker-rail .pip.left{
+  border-color:#fff0a7;
+  background:linear-gradient(#fff4b0,#ffc54d);
+  box-shadow:0 0 10px #ffd15a99,inset 0 1px 0 #fff;
+  transform:translateY(-1px);
+}
+.breaker-rail .pip.left::after{background:#fff7d5}
+
+.power-route{
+  position:relative;
+  gap:7px;
+  padding:8px 9px 9px;
+  border:1px solid #a9b4d5;
+  border-radius:12px;
+  background:linear-gradient(180deg,#f6f3fb,#e8e8f5);
+  box-shadow:inset 0 1px 0 #fff,0 3px 0 #7a86af3d;
+}
+:root[data-theme="dark"] .power-route{background:linear-gradient(180deg,#222c59,#182047)}
+.power-route::before{
+  content:"";
+  position:absolute;
+  inset-inline:15px;
+  bottom:4px;
+  height:2px;
+  border-radius:2px;
+  background:linear-gradient(90deg,#6879ad,#ffd36d 78%,#fff1ad);
+  box-shadow:0 0 6px #ffd36d66;
+}
+.power-route button,.power-route .here{position:relative;z-index:1}
+.power-route .here{
+  border-radius:8px;
+  background:#ffd66f;
+  color:#302b57;
+  box-shadow:0 2px 0 #b87542,0 0 10px #ffda7488;
+}
+.power-route .sep{position:relative;z-index:1;font-size:1.1rem;color:#6978aa}
+
+.gauge-panel{
+  position:relative;
+  overflow:hidden;
+  border-color:#8d9cc7;
+  background:
+    radial-gradient(circle at 88% 20%,#ffe48a4d 0 3px,transparent 4px),
+    linear-gradient(145deg,var(--surface) 0 76%,color-mix(in srgb,var(--surface) 82%,#9eabd3) 76% 100%);
+  box-shadow:inset 0 1px 0 #fff8,0 5px 0 #5c6b963d,0 11px 24px #1826541a;
+}
+.gauge-panel::after{
+  content:"";
+  position:absolute;
+  inset-inline-end:11px;
+  top:11px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ffd45f;
+  box-shadow:0 0 9px #ffc83e;
+  animation:feel-panel-led 2.2s ease-in-out infinite alternate;
+}
+.gauge-panel .figs{
+  margin-top:8px;
+  padding:8px 10px;
+  border:1px solid color-mix(in srgb,var(--line) 78%,#6577ac);
+  border-radius:11px;
+  background:color-mix(in srgb,var(--surface) 88%,#dce5f3);
+  box-shadow:inset 0 2px 5px #26366214;
+}
+.gauge-panel .now{font-variant-numeric:tabular-nums;text-shadow:0 2px 0 #ffffffaa,0 0 10px #f2a84e38}
+
+.tile::before{
+  content:"";
+  position:absolute;
+  inset-inline-start:0;
+  top:0;
+  bottom:0;
+  width:6px;
+  background:linear-gradient(#7d8fbe,#a9b7d9);
+  box-shadow:2px 0 8px #52658a22;
+}
+.tile:not([disabled])::after{
+  content:"";
+  position:absolute;
+  inset-inline-end:11px;
+  bottom:10px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  border:2px solid #7f8db5;
+  background:#e8edf8;
+}
+.tile.clear::before{background:linear-gradient(#65c891,#2f8b60);box-shadow:2px 0 9px #38a87055}
+.tile.clear::after{background:#73dda3;border-color:#3a9567;box-shadow:0 0 8px #5ed797}
+.tile.still::before{background:linear-gradient(#979caf,#73798e)}
+
+@keyframes feel-panel-led{from{opacity:.55;filter:brightness(.9)}to{opacity:1;filter:brightness(1.25)}}
+
+/* Sales mission: the overview and drill-down scenes feel like one lively district. */
+.stage.commerce .shop-sky,.stage.commerce .shop-floor,.stage.commerce .shop-fronts,
+.stage.commerce .shop-activity,.stage.commerce .shop-lights,.stage.commerce .shop-mystery{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.stage.commerce .shop-sky{animation:feel-shop-sky 9s ease-in-out infinite alternate}
+.stage.commerce .shop-cloud-one{animation:feel-shop-cloud 13s linear infinite alternate}
+.stage.commerce .shop-cloud-two{animation:feel-shop-cloud 17s linear infinite alternate-reverse}
+.stage.commerce .shop-bulb{animation:feel-shop-bulb 1.8s ease-in-out infinite alternate;filter:drop-shadow(0 0 4px currentColor)}
+.stage.commerce .shop-bulb:nth-of-type(3n){animation-delay:-.65s}
+.stage.commerce .shop-bulb:nth-of-type(3n+1){animation-delay:-1.2s}
+.stage.commerce .shop-sign-light{animation:feel-shop-sign 1.3s steps(2,end) infinite}
+.stage.commerce .shop-window{filter:drop-shadow(0 0 4px #9ed7e077)}
+.stage.commerce .shop-customer{transform-box:fill-box;transform-origin:50% 100%;animation:feel-shop-customer 2.5s ease-in-out infinite alternate}
+.stage.commerce .customer-two{animation-delay:-1.1s}
+.stage.commerce .shop-scooter{animation:feel-shop-scooter 6.5s ease-in-out infinite}
+.stage.commerce .shop-mystery{animation:feel-shop-mystery 1.4s ease-in-out infinite alternate}
+.stage.commerce .scene-lamp{filter:drop-shadow(0 0 5px #efd59a)}
+.stage.commerce .scene-label{font-weight:800;fill:#fff1cd}
+.stage.commerce[data-scene^="branch"] .scene-window,
+.stage.commerce[data-scene^="product"] .scene-window,
+.stage.commerce[data-scene^="pay"] .scene-window{filter:drop-shadow(0 0 4px #ffe39566)}
+
+@keyframes feel-shop-sky{from{transform:scale(1)}to{transform:scale(1.012) translateY(-1px)}}
+@keyframes feel-shop-cloud{from{transform:translateX(-8px)}to{transform:translateX(14px)}}
+@keyframes feel-shop-bulb{from{opacity:.58}to{opacity:1}}
+@keyframes feel-shop-sign{0%,88%,100%{opacity:1}90%,94%{opacity:.25}}
+@keyframes feel-shop-customer{from{transform:translateY(0) rotate(-.5deg)}to{transform:translateY(-2px) rotate(.7deg)}}
+@keyframes feel-shop-scooter{0%,18%{transform:translateX(-125px)}48%,70%{transform:translateX(0)}100%{transform:translateX(165px)}}
+@keyframes feel-shop-mystery{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-4px) rotate(2deg)}}
+
+/* Mission framing and outcomes reuse the existing screens and copy. */
+.app[data-feel-view="home"] #game .panel,
+.app[data-feel-view="won"] #game .panel,
+.app[data-feel-view="lost"] #game .panel,
+.app[data-feel-view="why"] #game .panel{
+  position:relative;
+  overflow:hidden;
+}
+.app[data-feel-view="home"] #game .panel::before,
+.app[data-feel-view="won"] #game .panel::before,
+.app[data-feel-view="lost"] #game .panel::before,
+.app[data-feel-view="why"] #game .panel::before{
+  content:"";
+  display:block;
+  height:7px;
+  margin:-14px -16px 14px;
+  background:linear-gradient(90deg,#6375b0,#ffd46b,#8bd6b0);
+  box-shadow:0 2px 10px #3d4e7f4a;
+}
+.app[data-feel-view="home"] #game .panel::after{
+  content:"⚡";
+  position:absolute;
+  inset-inline-end:15px;
+  top:16px;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:#3a315f;
+  background:#ffd568;
+  border:3px solid #fff0ac;
+  box-shadow:0 4px 0 #a76c40,0 0 16px #ffd15e88;
+  transform:rotate(-8deg);
+}
+.app[data-feel-view="home"] #game .panel h2{padding-inline-end:52px}
+.app[data-feel-view="home"] #game .panel p{max-width:54ch}
+.tutorial-note,.next-step{
+  border-inline-start:4px solid #e4ad4f;
+  padding:7px 11px;
+  border-radius:8px;
+  background:#ffe6a833;
+}
+.field#answer{
+  background:#fffdf5;
+  color:#171b3a;
+  -webkit-text-fill-color:#171b3a;
+  caret-color:#171b3a;
+}
+.field#answer::placeholder{color:#59608a;opacity:1}
+.next-step{color:var(--ink);font-weight:800;box-shadow:inset 0 0 0 1px #d6b76a55}
+
+.clues{
+  counter-reset:feel-clue;
+  perspective:500px;
+}
+.clues li{
+  counter-increment:feel-clue;
+  position:relative;
+  padding-inline-start:44px;
+  background:
+    linear-gradient(100deg,color-mix(in srgb,var(--surface) 92%,#fff5cf),var(--surface));
+  transition:transform var(--feel-fast) var(--feel-ease-out),box-shadow var(--feel-fast) ease;
+}
+.clues li::before{
+  content:counter(feel-clue);
+  position:absolute;
+  inset-inline-start:10px;
+  top:50%;
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:#2b315a;
+  background:#ffd66f;
+  border:2px solid #e3a955;
+  font-family:"Lalezar","Almarai",Tahoma,sans-serif;
+  transform:translateY(-50%);
+  box-shadow:0 2px 0 #9d6f45;
+}
+.clues li:nth-child(even){transform:rotate(.25deg)}
+.clues li:hover{transform:translateY(-2px) rotate(0);box-shadow:3px 6px 0 #302b6d24}
+
+.ev{
+  position:relative;
+  padding-inline-start:48px;
+  border-style:solid;
+  background:linear-gradient(120deg,color-mix(in srgb,var(--surface) 88%,#fff0b8),var(--surface));
+  box-shadow:0 5px 0 #8c7ca63b;
+}
+.ev::before{
+  content:"🔎";
+  position:absolute;
+  inset-inline-start:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:1.35rem;
+  filter:drop-shadow(0 2px 0 #90704f55);
+}
+
+.app[data-feel-view="won"] #game .panel{
+  border-color:#83c59e;
+  background:
+    radial-gradient(circle at 86% 18%,#fff0a8aa 0 9%,transparent 24%),
+    linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--surface) 82%,#bff0cf));
+  box-shadow:0 7px 0 #43866355,0 16px 32px #244a3530;
+  animation:feel-outcome-enter 620ms var(--feel-ease-snap) both;
+}
+.app[data-feel-view="won"] #game .panel::before{background:linear-gradient(90deg,#4eb67d,#ffe177,#4eb67d)}
+.app[data-feel-view="won"] .stars{animation:feel-stars-celebrate 850ms var(--feel-ease-snap) both}
+.app[data-feel-view="won"] .msg.good{box-shadow:inset 5px 0 0 #3da16c}
+
+.app[data-feel-view="lost"] #game .panel{
+  border-color:#b56b75;
+  background:
+    linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--surface) 86%,#d18a90));
+  box-shadow:0 7px 0 #743e4b55,0 16px 32px #471e2930;
+  animation:feel-loss-card 520ms var(--feel-ease-out) both;
+}
+.app[data-feel-view="lost"] #game .panel::before{background:linear-gradient(90deg,#833f55,#d46b65,#833f55)}
+.app[data-feel-view="lost"] #game .btn:first-of-type{border-color:#ffd2a5;background:#ffbd65}
+
+.app[data-feel-view="board"] .pts,
+.app[data-feel-view="reflect"] .pts{
+  display:inline-block;
+  padding:4px 13px;
+  border-radius:11px;
+  color:#2c3158;
+  background:#ffdd7c;
+  border:2px solid #d5a450;
+  box-shadow:0 4px 0 #9e7147;
+}
+.board li.me{
+  margin-inline:-7px;
+  padding-inline:9px;
+  border-radius:9px;
+  background:#ffdf7d47;
+  box-shadow:inset 4px 0 0 #eab950;
+}
+
+@keyframes feel-outcome-enter{from{opacity:.35;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes feel-loss-card{from{opacity:.45;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes feel-stars-celebrate{0%{opacity:.2;transform:scale(.7) rotate(-4deg)}65%{transform:scale(1.15) rotate(2deg)}100%{opacity:1;transform:none}}
+
+@keyframes feel-sky-drift{
+  from{transform:translate3d(-2px,0,0) scale(1.005)}
+  to{transform:translate3d(3px,1px,0) scale(1.012)}
+}
+
+@keyframes feel-horizon-breathe{
+  from{transform:translateY(1px) scaleX(1.004);opacity:.88}
+  to{transform:translateY(-1px) scaleX(1.01);opacity:1}
+}
+
+@keyframes feel-generator-pulse{
+  0%,100%{opacity:.45;filter:drop-shadow(0 0 1px #baffca)}
+  50%{opacity:1;filter:drop-shadow(0 0 5px #baffca)}
+}
+
+@keyframes feel-scene-jolt{
+  0%,100%{transform:translate3d(0,0,0)}
+  28%{transform:translate3d(4px,1px,0)}
+  55%{transform:translate3d(-3px,0,0)}
+  78%{transform:translate3d(2px,-1px,0)}
+}
+
+@keyframes feel-wrong-flash{
+  0%{opacity:0;background:#ff4f4933}
+  22%{opacity:1;background:#ff4f493f}
+  100%{opacity:0;background:#ff4f4900}
+}
+
+@keyframes feel-grid-confirm{
+  0%{opacity:.58;filter:drop-shadow(0 0 2px #7d8bc066)}
+  45%{opacity:1;filter:drop-shadow(0 0 9px #ffe98f)}
+  100%{opacity:.68;filter:drop-shadow(0 0 3px #ffe98f77)}
+}
+
+@keyframes feel-fix-spark{
+  0%{transform:scale(.6);opacity:.25}
+  45%{transform:scale(2.4);opacity:1}
+  100%{transform:scale(1);opacity:.7}
+}
+
+@keyframes feel-fix-wave{
+  0%{opacity:0;background:linear-gradient(90deg,transparent,#ffe69a00)}
+  45%{opacity:.65;background:linear-gradient(90deg,transparent 8%,#ffe69a55 50%,transparent 92%)}
+  100%{opacity:0;background:linear-gradient(90deg,transparent,#ffe69a00)}
+}
+
+@keyframes feel-win-wash{
+  0%{opacity:0;background:radial-gradient(circle at 50% 100%,#ffeaa900 0 8%,transparent 9%)}
+  45%{opacity:.85;background:radial-gradient(circle at 50% 100%,#ffeaa966 0 55%,transparent 78%)}
+  100%{opacity:0;background:radial-gradient(circle at 50% 100%,#ffeaa922 0 100%,transparent 100%)}
+}
+
+@keyframes feel-city-rise{
+  0%{transform:translateY(4px);filter:brightness(.75)}
+  55%{transform:translateY(-1px);filter:brightness(1.35)}
+  100%{transform:translateY(0);filter:brightness(1)}
+}
+
+@keyframes feel-loss-settle{
+  0%{filter:brightness(1) saturate(1)}
+  100%{filter:brightness(.7) saturate(.7)}
+}
+
+@keyframes feel-loss-vignette{
+  0%{opacity:0;box-shadow:inset 0 0 0 #03071600}
+  100%{opacity:1;box-shadow:inset 0 0 70px #030716cc}
+}
+
+@keyframes feel-character-breathe{
+  0%,100%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(-1.5px) scaleY(1.012)}
+}
+
+@keyframes feel-character-blink{
+  0%,44%,48%,100%{transform:scaleY(1)}
+  46%{transform:scaleY(.08)}
+}
+
+@keyframes feel-mouth-talk{
+  from{transform:scaleY(.72) translateY(-.4px)}
+  to{transform:scaleY(1.35) translateY(.8px)}
+}
+
+@keyframes feel-angry-posture{
+  from{transform:translateX(-1px) rotate(-.5deg)}
+  to{transform:translateX(1.5px) rotate(.7deg)}
+}
+
+@keyframes feel-worried-posture{
+  from{transform:translateY(0)}
+  to{transform:translateY(1.5px)}
+}
+
+@keyframes feel-character-celebrate{
+  from{transform:translateY(0) rotate(-1deg)}
+  to{transform:translateY(-7px) rotate(1.5deg)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  :root{
+    --feel-fast:1ms;
+    --feel-medium:1ms;
+    --feel-slow:1ms;
+  }
+  .stage[data-feel-ready="true"] *,
+  .stage[data-feel-ready="true"] *::before,
+  .stage[data-feel-ready="true"] *::after{
+    animation-duration:1ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:1ms!important;
+  }
+  .app.feel-wrong .stage,
+  .app.feel-fix .power-grid,
+  .app.feel-fix .spark,
+  .app.feel-win .city-mid,
+  .app.feel-loss .stage,
+  .app.feel-wrong .stage::after,
+  .app.feel-fix .stage::after,
+  .app.feel-win .stage::after,
+  .app.feel-loss .stage::after{
+    animation:none!important;
+  }
+  .actor:not([hidden]) .character-svg,
+  .character-eyes,
+  .character-mouth,
+  .character-body,
+  .actor.joyful .character-svg{
+    animation:none!important;
+  }
+  .gauge-panel::after{animation:none!important}
+  .stage.commerce .shop-sky,.stage.commerce .shop-cloud-one,.stage.commerce .shop-cloud-two,
+  .stage.commerce .shop-bulb,.stage.commerce .shop-sign-light,.stage.commerce .shop-customer,
+  .stage.commerce .shop-scooter,.stage.commerce .shop-mystery{animation:none!important}
+  .app[data-feel-view="won"] #game .panel,.app[data-feel-view="lost"] #game .panel,
+  .app[data-feel-view="won"] .stars{animation:none!important}
+}
