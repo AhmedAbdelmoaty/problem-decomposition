@@ -13,8 +13,7 @@
       {file:'bat_03.flac',volume:1.65}
     ],
     dogs:[
-      {file:'dragon-studio-distant-dog-barking-472373.mp3',volume:1.9,weight:4},
-      {file:'dbsound-dog-barking-in-distant-502553.mp3',volume:1.05,weight:1}
+      {file:'dragon-studio-distant-dog-barking-472373.mp3',volume:1.9,weight:1}
     ],
     power:{file:'killconfirmed.wav',volume:1.7}
   };
@@ -142,7 +141,7 @@
     timers.bats=setTimeout(function(){
       if(!voicePlaying()) playEvent(EVENTS.bats[Math.floor(Math.random()*EVENTS.bats.length)]);
       scheduleBats();
-    },4000+Math.random()*4000);
+    },2200+Math.random()*2300);
   }
 
   function scheduleDogs(){
@@ -151,7 +150,7 @@
     timers.dogs=setTimeout(function(){
       if(!voicePlaying()) playEvent(weighted(EVENTS.dogs));
       scheduleDogs();
-    },12000+Math.random()*8000);
+    },3200+Math.random()*3800);
   }
 
   function powerReturn(){
