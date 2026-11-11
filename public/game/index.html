@@ -1261,6 +1261,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function renderWon(){
     var last=G.li===NL-1, h='<section class="panel mt"><h2>'+(L.city?'المدينة نوّرت':'المبيعات رجعت')+'</h2>'+
+      starsHtml(G.stars[G.li])+'<div class="pts">'+fmt(G.pts[G.li])+' نقطة</div>'+ 
       '<p>'+S.used+' تفكيكات (أقل عدد ممكن '+L.opt+')'+(race()?'، وفاضل '+S.secLeft+' ثانية':'')+'.</p><ul class="found">';
     S.fixed.forEach(function(f){h+='<li>'+esc(f.where)+': '+esc(f.cause)+'.</li>';});
     h+='</ul><p class="lesson">'+esc(L.lesson)+'</p>'+

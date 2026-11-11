@@ -323,6 +323,13 @@
   border-radius:8px;
   background:#ffe6a833;
 }
+.field#answer{
+  background:#fffdf5;
+  color:#171b3a;
+  -webkit-text-fill-color:#171b3a;
+  caret-color:#171b3a;
+}
+.field#answer::placeholder{color:#59608a;opacity:1}
 .next-step{color:var(--ink);font-weight:800;box-shadow:inset 0 0 0 1px #d6b76a55}
 
 .clues{
