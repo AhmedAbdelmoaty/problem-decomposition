@@ -13,6 +13,8 @@ type FeelWindow = Window &
 const testDir = dirname(fileURLToPath(import.meta.url));
 const root = resolve(testDir, "../..");
 const runtimePath = join(root, "public/game/game-feel.js");
+const gameHtmlPath = join(root, "public/game/index.html");
+const feelCssPath = join(root, "public/game/game-feel.css");
 
 function loadRuntime() {
   const source = readFileSync(runtimePath, "utf8");
@@ -24,6 +26,25 @@ function setDebugState(state: unknown | (() => unknown)) {
   (window as FeelWindow).dcDebug = {
     state: typeof state === "function" ? (state as () => unknown) : () => state,
   };
+}
+
+function renderCityScene() {
+  const html = readFileSync(gameHtmlPath, "utf8").replace(/\r\n?/g, "\n");
+  const body = html.match(/function drawSky\(srcZone\)\{([\s\S]*?)\n  \}\n\n  function drawShop/)?.[1];
+  if (!body) throw new Error("drawSky body not found");
+  document.body.innerHTML = '<svg id="sky" viewBox="0 0 360 250"></svg>';
+  const sky = document.querySelector("#sky") as SVGElement;
+  const draw = new Function("sky", "L", "G", "ri", "FW", "ZNAMES", "srcZone", body);
+  draw(
+    sky,
+    null,
+    { li: 0 },
+    (max: number) => Math.max(0, Math.floor(max / 2)),
+    ["#FFC247", "#FF8FB1", "#8FE3FF"],
+    ["المصانع", "وسط البلد", "السكني", "الميناء", "الجامعة"],
+    null,
+  );
+  return sky;
 }
 
 describe("game feel presentation runtime", () => {
@@ -89,5 +110,28 @@ describe("game feel presentation runtime", () => {
     state = { G: { view: "play", li: 0, mode: "learn" }, S: {}, L: { city: true } };
     runtime?.sync();
     expect(document.querySelector(".app")).toHaveAttribute("data-feel-pressure", "active");
+  });
+
+  it("renders a layered city while preserving every clickable zone", () => {
+    const sky = renderCityScene();
+
+    expect(sky.querySelector('.sky-layer[data-feel-layer="far"]')).not.toBeNull();
+    expect(sky.querySelector('.city-back[data-feel-layer="far"]')).not.toBeNull();
+    expect(sky.querySelector('.city-mid[data-feel-layer="mid"]')).not.toBeNull();
+    expect(sky.querySelector('.street-life[data-feel-layer="front"]')).not.toBeNull();
+    expect(sky.querySelector('.power-grid[data-feel-layer="play"]')).not.toBeNull();
+    expect(sky.querySelector('.city-front[data-feel-layer="front"]')).not.toBeNull();
+    expect([...sky.querySelectorAll(".zone")].map((zone) => zone.getAttribute("data-z"))).toEqual([
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+    ]);
+
+    const css = readFileSync(feelCssPath, "utf8");
+    expect(css).toContain(".sky-layer,.city-back,.city-mid,.street-life,.power-grid,.city-front,.bats");
+    expect(css).toContain("pointer-events:none");
+    expect(css).toContain("@media (prefers-reduced-motion:reduce)");
   });
 });
