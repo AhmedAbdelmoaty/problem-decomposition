@@ -317,6 +317,13 @@
 }
 .app[data-feel-view="home"] #game .panel h2{padding-inline-end:52px}
 .app[data-feel-view="home"] #game .panel p{max-width:54ch}
+.tutorial-note,.next-step{
+  border-inline-start:4px solid #e4ad4f;
+  padding:7px 11px;
+  border-radius:8px;
+  background:#ffe6a833;
+}
+.next-step{color:var(--ink);font-weight:800;box-shadow:inset 0 0 0 1px #d6b76a55}
 
 .clues{
   counter-reset:feel-clue;

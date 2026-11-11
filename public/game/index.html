@@ -899,7 +899,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     timerEl.hidden=!show;
     if(!show){stage.classList.remove('hot');return;}
     var r=Math.max(0,remMs()), s=Math.ceil(r/1000), hot=!!S.deadline&&s<=10;
-    tlabel.textContent=L.city?'وقود مولّد المستشفى':'الوقت الباقي';
+    tlabel.textContent=L.city?'الوقت الباقي قبل ما يفصل المولّد':'الوقت الباقي';
     tfill.style.width=(r/(L.time*1000)*100)+'%';
     tnum.textContent=s;
     timerEl.classList.toggle('hot',hot);
@@ -1174,7 +1174,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     return '<section class="panel gauge-panel"><h2>'+esc(title)+'</h2><div class="figs">'+
       '<span class="now">'+fmt(n.actual)+'</span>'+
       '<span class="usual">المعتاد '+fmt(n.normal)+'</span>'+diffHtml(n)+
-      '</div><div class="unit">'+L.unit+'</div></section>';
+      '</div><div class="unit">وحدة القياس: '+L.unit+'</div></section>';
   }
   function tile(c,i){
     var cls='tile', tag='', dis='';
@@ -1196,10 +1196,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     var lock=!G.learned;
     return '<section class="panel mt"><h2>مستشفى المدينة على المولّد</h2>'+
       '<p>الكهربا قطعت عن المدينة كلها. مهمتك تلاقي السبب بالتحليل، والتحليل معناه التفكيك: تاخد الرقم العام وتقسّمه لحد ما السبب يبان.</p>'+
-      '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+
+      '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+ 
+      '<p class="say note tutorial-note">ابدأ من الرقم العام، قارنه بالمعتاد، وبعدها فكّكه خطوة خطوة. كل اختيار بيقرّبك من مكان المشكلة أو يرجّعك خطوة للمراجعة.</p>'+ 
       (lock?'<button class="btn" data-act="mode" data-m="learn">وضع التعلّم: من غير عدّاد</button>'+
-        '<button class="btn ghost" data-act="mode" data-m="race" disabled>وضع التحدي: عدّاد ولوحة ترتيب</button>'
-       :'<button class="btn" data-act="mode" data-m="race">وضع التحدي: عدّاد ولوحة ترتيب</button>')+
+        '<button class="btn ghost" data-act="mode" data-m="race" disabled>وضع التحدي: بعدّاد</button>'
+       :'<button class="btn" data-act="mode" data-m="race">وضع التحدي: بعدّاد</button>')+
       (lock?'<p class="say note">وضع التحدي بيتفتح بعد ما تخلّص وضع التعلّم.</p>':'')+'</section>';
   }
 
@@ -1234,6 +1235,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       }else{
         h+='<p class="say note">قارن كل رقم بالمعتاد بتاعه، ودوس على اللي عايز تفكّكه'+(kids[0].zone!=null?'. تقدر كمان تدوس على الحي في صورة المدينة':'')+'.</p>';
       }
+      if(S.good) h+='<p class="say note next-step">السبب اتصلّح، لكن المهمة لسه مستمرة. ارجع خطوة وكمل البحث عن باقي الاختلاف.</p>';
       h+='<div class="grid">'+kids.map(tile).join('')+'</div>';
       if(kids[0].inert) h+='<button class="btn" data-act="up" data-i="0">ارجع للأدلة وجرّب بُعد تاني</button>';
     }
@@ -1259,11 +1261,10 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
   function renderWon(){
     var last=G.li===NL-1, h='<section class="panel mt"><h2>'+(L.city?'المدينة نوّرت':'المبيعات رجعت')+'</h2>'+
-      starsHtml(G.stars[G.li])+'<div class="pts">'+fmt(G.pts[G.li])+' نقطة</div>'+
       '<p>'+S.used+' تفكيكات (أقل عدد ممكن '+L.opt+')'+(race()?'، وفاضل '+S.secLeft+' ثانية':'')+'.</p><ul class="found">';
     S.fixed.forEach(function(f){h+='<li>'+esc(f.where)+': '+esc(f.cause)+'.</li>';});
     h+='</ul><p class="lesson">'+esc(L.lesson)+'</p>'+
-      '<button class="btn" data-act="next">'+(last?(race()?'شوف نتيجتك':(FEAT.reflect?'آخر خطوة: اكتب القاعدة بكلامك':'خلّصت وضع التعلّم')):'المهمة اللي بعدها')+'</button></section>';
+      '<button class="btn" data-act="next">'+(last?'آخر خطوة: اكتب القاعدة بكلامك':'المهمة اللي بعدها')+'</button></section>';
     return h;
   }
   function renderLost(){
@@ -1443,11 +1444,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     if(act==='mode'){G.mode=b.getAttribute('data-m');G.pts=[0,0,0,0];G.stars=[0,0,0,0];startLevel(0);return;}
     if(act==='next'){
       if(G.li<NL-1){startLevel(G.li+1);return;}
-      if(race()){
-        var total=G.pts.reduce(function(a,c){return a+c;},0);
-        store('dc_best',String(Math.max(total,+store('dc_best')||0)));
-        B.saved=false;B.err=false;G.view='board';loadBoard();
-      }else{G.view='reflect';G.compared=false;G.answer='';}
+      G.view='reflect';G.compared=false;G.answer='';
       render();window.scrollTo({top:0,behavior:'smooth'});return;
     }
     if(act==='retry'){startLevel(G.li);return;}
