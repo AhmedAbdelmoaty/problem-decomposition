@@ -28,8 +28,7 @@
   var mixTimer=0;
   var syncTimer=0;
   var eventAudio=[];
-  var context=null;
-  var loopGains={};
+  var boosters={};
 
   Object.keys(MIX).forEach(function(key){
     var audio=new Audio(DIR+MIX[key].file);
@@ -39,24 +38,17 @@
     audio.dataset.target='0';
     audio.dataset.level='0';
     loops[key]=audio;
+    boosters[key]=[];
+    var copies=key==='cityBed'?2:1;
+    for(var i=0;i<copies;i++){
+      var boost=new Audio(DIR+MIX[key].file);
+      boost.loop=true;boost.preload='auto';boost.volume=1;
+      boosters[key].push(boost);
+    }
   });
 
   function ensureContext(){
-    if(context) return context;
-    try{
-      var C=global.AudioContext||global.webkitAudioContext;
-      if(!C) return null;
-      context=new C();
-      Object.keys(loops).forEach(function(key){
-        var source=context.createMediaElementSource(loops[key]);
-        var gain=context.createGain();
-        gain.gain.value=0;
-        source.connect(gain);gain.connect(context.destination);
-        loopGains[key]=gain;
-      });
-      if(context.state==='suspended') context.resume();
-      return context;
-    }catch(e){return null;}
+    return null;
   }
 
   function wireEvent(audio,level){
@@ -85,13 +77,16 @@
   }
 
   function playLoop(key){
-    var audio=loops[key];
-    if(!audio||!audio.paused) return;
-    if(!Number.isFinite(audio.currentTime)||audio.currentTime===0){
-      try{audio.currentTime=Math.random()*25;}catch(e){}
-    }
-    var p=audio.play();
-    if(p&&p.catch) p.catch(function(){});
+    var main=loops[key];
+    if(!main) return;
+    var tracks=[main].concat(boosters[key]||[]);
+    var offset=main.currentTime;
+    if(!Number.isFinite(offset)||offset===0) offset=Math.random()*25;
+    tracks.forEach(function(audio){
+      if(!audio.paused) return;
+      try{audio.currentTime=offset;}catch(e){}
+      var p=audio.play();if(p&&p.catch)p.catch(function(){});
+    });
   }
 
   function target(key,value){
@@ -109,9 +104,11 @@
       if(Math.abs(delta)<.004) current=wanted;
       else current=Math.max(0,current+delta*.18);
       audio.dataset.level=String(current);
-      if(loopGains[key]) loopGains[key].gain.value=current;
-      else audio.volume=Math.min(1,current);
-      if(wanted===0&&current<.004&&!audio.paused){audio.pause();audio.dataset.level='0';}
+      [audio].concat(boosters[key]||[]).forEach(function(track){
+        track.volume=Math.min(1,current);
+        if(wanted===0&&current<.004&&!track.paused) track.pause();
+      });
+      if(wanted===0&&current<.004) audio.dataset.level='0';
     });
   }
 
@@ -145,7 +142,7 @@
     timers.bats=setTimeout(function(){
       if(!voicePlaying()) playEvent(EVENTS.bats[Math.floor(Math.random()*EVENTS.bats.length)]);
       scheduleBats();
-    },7000+Math.random()*7000);
+    },4000+Math.random()*4000);
   }
 
   function scheduleDogs(){
@@ -154,7 +151,7 @@
     timers.dogs=setTimeout(function(){
       if(!voicePlaying()) playEvent(weighted(EVENTS.dogs));
       scheduleDogs();
-    },25000+Math.random()*20000);
+    },12000+Math.random()*8000);
   }
 
   function powerReturn(){
@@ -208,7 +205,9 @@
 
   function destroy(){
     clearInterval(syncTimer);clearInterval(mixTimer);stopEvents();
-    Object.keys(loops).forEach(function(key){loops[key].pause();});
+    Object.keys(loops).forEach(function(key){
+      [loops[key]].concat(boosters[key]||[]).forEach(function(audio){audio.pause();});
+    });
     document.removeEventListener('pointerdown',unlock,true);
     document.removeEventListener('keydown',unlock,true);
   }
