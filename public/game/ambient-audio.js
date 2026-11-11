@@ -4,7 +4,7 @@
   var DIR='audio/ambient/';
   var MIX={
     cityBed:{file:'freesound_community-night-ambience-17064.mp3',volume:2.6},
-    cityCrickets:{file:'schorsch1964-night-atmosphere-with-crickets-374652.mp3',volume:1.55},
+    cityCrickets:{file:'schorsch1964-night-atmosphere-with-crickets-374652.mp3',volume:.48},
     shop:{file:'alex_jauk-supermarket-ambience-sounds-518582.mp3',volume:2.25}
   };
   var EVENTS={
@@ -150,7 +150,7 @@
     timers.dogs=setTimeout(function(){
       if(!voicePlaying()) playEvent(weighted(EVENTS.dogs));
       scheduleDogs();
-    },3200+Math.random()*3800);
+    },1800+Math.random()*2000);
   }
 
   function powerReturn(){
