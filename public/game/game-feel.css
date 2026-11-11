@@ -81,6 +81,31 @@
   filter:drop-shadow(0 0 8px color-mix(in srgb,var(--feel-danger) 55%,transparent));
 }
 
+.actor:not([hidden]) .character-svg{
+  transform-box:fill-box;
+  transform-origin:50% 100%;
+  animation:feel-character-breathe 2.8s ease-in-out infinite;
+}
+
+.character-eyes{
+  transform-box:fill-box;
+  transform-origin:50% 55%;
+  animation:feel-character-blink 5.2s steps(1,end) infinite;
+}
+
+.character-body,.character-mouth{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+.app[data-voice-playing="true"] .character-mouth{
+  animation:feel-mouth-talk 170ms ease-in-out infinite alternate;
+}
+
+.mood-angry .character-body{animation:feel-angry-posture 650ms ease-in-out infinite alternate}
+.mood-worried .character-body,.mood-tired .character-body{animation:feel-worried-posture 1.8s ease-in-out infinite alternate}
+.actor.joyful .character-svg{animation:feel-character-celebrate 640ms var(--feel-ease-snap) infinite alternate}
+
 @keyframes feel-sky-drift{
   from{transform:translate3d(-2px,0,0) scale(1.005)}
   to{transform:translate3d(3px,1px,0) scale(1.012)}
@@ -149,6 +174,36 @@
   100%{opacity:1;box-shadow:inset 0 0 70px #030716cc}
 }
 
+@keyframes feel-character-breathe{
+  0%,100%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(-1.5px) scaleY(1.012)}
+}
+
+@keyframes feel-character-blink{
+  0%,44%,48%,100%{transform:scaleY(1)}
+  46%{transform:scaleY(.08)}
+}
+
+@keyframes feel-mouth-talk{
+  from{transform:scaleY(.72) translateY(-.4px)}
+  to{transform:scaleY(1.35) translateY(.8px)}
+}
+
+@keyframes feel-angry-posture{
+  from{transform:translateX(-1px) rotate(-.5deg)}
+  to{transform:translateX(1.5px) rotate(.7deg)}
+}
+
+@keyframes feel-worried-posture{
+  from{transform:translateY(0)}
+  to{transform:translateY(1.5px)}
+}
+
+@keyframes feel-character-celebrate{
+  from{transform:translateY(0) rotate(-1deg)}
+  to{transform:translateY(-7px) rotate(1.5deg)}
+}
+
 @media (prefers-reduced-motion:reduce){
   :root{
     --feel-fast:1ms;
@@ -172,6 +227,13 @@
   .app.feel-fix .stage::after,
   .app.feel-win .stage::after,
   .app.feel-loss .stage::after{
+    animation:none!important;
+  }
+  .actor:not([hidden]) .character-svg,
+  .character-eyes,
+  .character-mouth,
+  .character-body,
+  .actor.joyful .character-svg{
     animation:none!important;
   }
 }

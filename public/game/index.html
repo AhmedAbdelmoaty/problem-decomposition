@@ -453,21 +453,24 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     cityHospitalGenerator:{file:'city/17-hospital-generator.mp3',ms:3600}
   };
   var voiceTrack=null, voiceTimers=[];
+  function setVoicePlaying(on){app.setAttribute('data-voice-playing',on?'true':'false');}
   function clearVoiceTimers(){voiceTimers.forEach(function(id){clearTimeout(id);});voiceTimers=[];}
   function hush(){
     clearVoiceTimers();
     if(voiceTrack){try{voiceTrack.pause();voiceTrack.currentTime=0;}catch(e){} voiceTrack=null;}
+    setVoicePlaying(false);
   }
   function primeVoice(){}
   function playVoice(key,onstart){
     hush();
     var meta=VOICE[key];if(!meta) return;
-    if(!sound){if(onstart) onstart();return;}
+    if(!sound){setVoicePlaying(false);if(onstart) onstart();return;}
     try{
       voiceTrack=new Audio(VOICE_DIR+meta.file);voiceTrack.preload='auto';voiceTrack.volume=1;
-      voiceTrack.addEventListener('play',function(){if(onstart) onstart();},{once:true});
-      voiceTrack.play().catch(function(){if(onstart) onstart();});
-    }catch(e){if(onstart) onstart();}
+      voiceTrack.addEventListener('play',function(){setVoicePlaying(true);if(onstart) onstart();},{once:true});
+      voiceTrack.addEventListener('ended',function(){setVoicePlaying(false);},{once:true});
+      voiceTrack.play().catch(function(){setVoicePlaying(false);if(onstart) onstart();});
+    }catch(e){setVoicePlaying(false);if(onstart) onstart();}
   }
   function powerRise(){
     if(!sound) return;
@@ -984,11 +987,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     driver2:{f:0,shirt:'#4fa38f',skin:'#a86a4c',hair:'#1f2238',stache:'#1f2238',glasses:1}
   };
   function characterSvg(role){
-    var c=CHAR[role]||CHAR.neighbor, o='<svg viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+    var c=CHAR[role]||CHAR.neighbor, o='<svg class="character-svg mood-'+(c.mood||'neutral')+'" viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
       '<ellipse cx="61" cy="150" rx="43" ry="5" fill="#080e30" opacity=".3"/>';
     if(c.long) o+='<path d="M27 50Q22 100 34 112h54q12-12 7-62Z" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
     if(c.hijab) o+='<path d="M22 60Q20 14 61 12Q102 14 100 60Q104 104 82 110H40Q18 104 22 60Z" fill="'+c.hijab+'" stroke="#29315d" stroke-width="5"/>';
-    o+='<path d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+c.shirt+'" stroke="#29315d" stroke-width="5"/>';
+    o+='<path class="character-body" d="M15 155Q18 104 52 102h20q36 6 38 53Z" fill="'+c.shirt+'" stroke="#29315d" stroke-width="5"/>';
     if(c.apron) o+='<path d="M44 108h34v47H44Z" fill="#f2ead8" stroke="#29315d" stroke-width="3"/>';
     if(c.vest) o+='<path d="M30 112h20l11 14 11-14h20l8 43H22Z" fill="#f0a84f" stroke="#29315d" stroke-width="3"/><path d="M31 128h60M39 112v43M83 112v43" stroke="#ffe099" stroke-width="3" opacity=".9"/>';
     if(c.coat) o+='<path d="M25 109h27l9 17 10-17h27l9 46H15Z" fill="#f7fbff" stroke="#29315d" stroke-width="3"/><path d="M52 109l9 17 10-17M61 126v29" fill="none" stroke="#9eb1c7" stroke-width="2.5"/>';
@@ -1002,17 +1005,19 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       if(c.bun) o+='<circle cx="61" cy="9" r="11" fill="'+c.hair+'" stroke="#24234d" stroke-width="4"/>';
     }
     // eyes
+    o+='<g class="character-eyes">';
     if(c.mood==='angry') o+='<path d="M39 50l15 5M70 55l15-5" stroke="#283059" stroke-width="4" stroke-linecap="round"/>';
     else if(c.mood==='worried'||c.mood==='tired') o+='<path d="M39 55l15-4M70 51l15 4" stroke="#283059" stroke-width="3" stroke-linecap="round"/>';
     else if(c.f) o+='<path d="M42 56l4-3M80 56l-4-3" stroke="#283059" stroke-width="2.5" stroke-linecap="round"/>';
     else o+='<path d="M40 52h14M70 52h14" stroke="'+(c.hair||'#283059')+'" stroke-width="4" stroke-linecap="round"/>';
     o+='<ellipse cx="48" cy="62" rx="3.5" ry="4.7" fill="#283059"/><ellipse cx="76" cy="62" rx="3.5" ry="4.7" fill="#283059"/>';
     if(c.glasses) o+='<circle cx="48" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><circle cx="76" cy="62" r="9" fill="none" stroke="#29315d" stroke-width="3"/><path d="M57 62h10" stroke="#29315d" stroke-width="3"/>';
-    if(c.mood==='angry') o+='<path d="M50 88q11-9 23 0" fill="none" stroke="#6b3a45" stroke-width="4" stroke-linecap="round"/>';
-    else if(c.mood==='worried'||c.mood==='tired'||c.mood==='serious') o+='<path d="M51 87q10-5 21 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
+    o+='</g>';
+    if(c.mood==='angry') o+='<path class="character-mouth" d="M50 88q11-9 23 0" fill="none" stroke="#6b3a45" stroke-width="4" stroke-linecap="round"/>';
+    else if(c.mood==='worried'||c.mood==='tired'||c.mood==='serious') o+='<path class="character-mouth" d="M51 87q10-5 21 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
     else if(c.f) o+='<ellipse cx="40" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/><ellipse cx="82" cy="74" rx="5" ry="3" fill="#e88b8b" opacity=".55"/>'+
-      '<path d="M52 83q9 7 18 0" fill="#c4566b" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>';
-    else o+='<path d="M51 86q10 6 22 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
+      '<path class="character-mouth" d="M52 83q9 7 18 0" fill="#c4566b" stroke="#8b4a5d" stroke-width="3" stroke-linecap="round"/>';
+    else o+='<path class="character-mouth" d="M51 86q10 6 22 0" fill="none" stroke="#6b3a45" stroke-width="3" stroke-linecap="round"/>';
     if(c.stache) o+='<path d="M47 78q14-8 28 0q-14 4-28 0Z" fill="'+c.stache+'" stroke="#24234d" stroke-width="2"/>';
     if(c.helmet) o+='<path d="M23 37Q25 9 60 9q35 0 37 28Z" fill="#ffd459" stroke="#29315d" stroke-width="4"/><path d="M19 38h82v8H19Z" fill="#f5ad4c" stroke="#29315d" stroke-width="3"/>';
     if(c.cap) o+='<path d="M27 38Q28 12 61 12Q94 12 95 38Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="4"/><path d="M60 36h48l-4 8H60Z" fill="'+c.cap+'" stroke="#29315d" stroke-width="3"/>';
@@ -1026,7 +1031,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     bubble.innerHTML=(o.who?'<strong class="speaker">'+esc(o.who)+'</strong>':'')+'<span class="speech">'+words+'</span>';
     bubble.className='bubble'+(o.tr?' tr':'')+(joyful?' joy':'');
     bubble.style.left=o.left||'5%';bubble.style.right=o.right||'auto';bubble.style.bottom=o.bottom||'42%';
-    actor.innerHTML=characterSvg(o.role||'worker');actor.dataset.role=o.role||'worker';actor.className='actor'+(o.tr?' right':'');actor.hidden=false;
+    actor.innerHTML=characterSvg(o.role||'worker');actor.dataset.role=o.role||'worker';actor.className='actor'+(o.tr?' right':'')+(joyful?' joyful':'');actor.hidden=false;
     bubble.hidden=false;DR.hide=Date.now()+(ms||5000);
   }
   function playCollision(){
