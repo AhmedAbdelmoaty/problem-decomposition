@@ -134,4 +134,62 @@ describe("game feel presentation runtime", () => {
     expect(css).toContain("pointer-events:none");
     expect(css).toContain("@media (prefers-reduced-motion:reduce)");
   });
+
+  it("keeps navigation neutral and emits one wrong-attempt effect without blocking controls", () => {
+    let state = {
+      G: { view: "play", li: 0, mode: "learn" },
+      S: { used: 0, fixed: [], whyMiss: false, good: false, msg: "", secLeft: 30 },
+      L: { city: true },
+    };
+    document.querySelector("#game")!.innerHTML = '<div class="stage"></div><button>اختيار</button>';
+    setDebugState(() => state);
+    const runtime = loadRuntime();
+    runtime?.sync();
+    const app = document.querySelector(".app")!;
+
+    state = { ...state, S: { ...state.S, used: 1 } };
+    runtime?.sync();
+    expect(app).not.toHaveClass("feel-wrong");
+    expect(app).not.toHaveClass("feel-fix");
+
+    state = { ...state, S: { ...state.S, used: 2, msg: "خسرت تفكيكة" } };
+    runtime?.sync();
+    const eventId = app.getAttribute("data-feel-event-id");
+    expect(app).toHaveClass("feel-wrong");
+    expect(app).toHaveAttribute("data-feel-event", "wrong");
+    expect(document.querySelector("button")).toBeEnabled();
+
+    runtime?.sync();
+    expect(app).toHaveAttribute("data-feel-event-id", eventId);
+  });
+
+  it("distinguishes proven fixes, wins, and losses as non-blocking presentation events", () => {
+    let state = {
+      G: { view: "play", li: 0, mode: "learn" },
+      S: { used: 1, fixed: [], whyMiss: false, good: false, msg: "", secLeft: 30 },
+      L: { city: true },
+    };
+    document.querySelector("#game")!.innerHTML = '<div class="stage"></div><button>التالي</button>';
+    setDebugState(() => state);
+    const runtime = loadRuntime();
+    runtime?.sync();
+    const app = document.querySelector(".app")!;
+
+    state = { ...state, S: { ...state.S, fixed: [{ where: "حي", cause: "سبب" }], good: true } };
+    runtime?.sync();
+    expect(app).toHaveClass("feel-fix");
+    expect(app).toHaveAttribute("data-feel-event", "fix");
+
+    state = { ...state, G: { ...state.G, view: "won" } };
+    runtime?.sync();
+    expect(app).toHaveClass("feel-win");
+    expect(app).toHaveAttribute("data-feel-event", "win");
+    expect(document.querySelector("button")).toBeEnabled();
+
+    state = { ...state, G: { ...state.G, view: "lost" } };
+    runtime?.sync();
+    expect(app).toHaveClass("feel-loss");
+    expect(app).toHaveAttribute("data-feel-event", "loss");
+    expect(document.querySelector("button")).toBeEnabled();
+  });
 });
