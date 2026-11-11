@@ -609,21 +609,43 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
 
   function drawShop(){
-    var out='<defs><linearGradient id="shopbg" x2="0" y2="1"><stop stop-color="#393A79"/><stop offset="1" stop-color="#B37C80"/></linearGradient></defs>'+
-      '<rect width="360" height="250" fill="url(#shopbg)"/>'+
-      '<circle cx="65" cy="63" r="28" fill="#FFE5A2" opacity=".9"/>'+
-      '<path d="M0 170h360v80H0Z" fill="#474675"/><path d="M0 218h360" stroke="#DBBDA1" stroke-width="2" stroke-dasharray="20 13"/>';
+    var out='<defs>'+ 
+      '<linearGradient id="shopbg" x2="0" y2="1"><stop stop-color="#242957"/><stop offset=".58" stop-color="#6B557B"/><stop offset="1" stop-color="#D08A73"/></linearGradient>'+ 
+      '<linearGradient id="shoproad" x2="0" y2="1"><stop stop-color="#55537D"/><stop offset="1" stop-color="#2D345E"/></linearGradient>'+ 
+      '<filter id="shopglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+ 
+      '</defs>'+ 
+      '<g class="shop-sky" data-feel-layer="far"><rect width="360" height="250" fill="url(#shopbg)"/>'+ 
+      '<circle cx="65" cy="57" r="25" fill="#FFE5A2" opacity=".88"/><circle cx="58" cy="51" r="3" fill="#D7BFA3" opacity=".45"/>'+ 
+      '<path d="M0 112l38-25 31 13 37-37 44 32 38-50 46 51 36-22 34 25 56-32v105H0Z" fill="#292B58" opacity=".72"/>'+ 
+      '<path class="shop-cloud-one" d="M-30 48q34-13 71-2t59 0q-31 11-68 9T-30 48Z" fill="#202349" opacity=".45"/>'+ 
+      '<path class="shop-cloud-two" d="M238 72q25-10 51-1t48 0q-23 9-52 7t-47-6Z" fill="#25264F" opacity=".42"/></g>'+ 
+      '<g class="shop-lights" data-feel-layer="mid"><path d="M4 76q88 24 176 0t176 0" fill="none" stroke="#343963" stroke-width="2"/>';
+    for(var l=0;l<12;l++){
+      var lx=11+l*31,ly=78+Math.round(Math.sin(l*.82)*8);
+      out+='<path d="M'+lx+' '+(ly-6)+'v8" stroke="#343963" stroke-width="1.5"/><circle class="shop-bulb" cx="'+lx+'" cy="'+(ly+4)+'" r="2.6" fill="'+(l%3===0?'#FF9FA6':l%3===1?'#FFE38A':'#8DE1D0')+'"/>';
+    }
+    out+='</g><g class="shop-floor" data-feel-layer="front"><path d="M0 166h360v84H0Z" fill="url(#shoproad)"/><path d="M0 217h360" stroke="#E1C9A2" stroke-width="2" stroke-dasharray="20 13"/>'+ 
+      '<path d="M0 172h360" stroke="#A9A1BD" stroke-width="3"/><path d="M0 239h360" stroke="#151B40" stroke-width="8" opacity=".65"/></g>'+ 
+      '<g class="shop-fronts" data-feel-layer="play">';
     for(var i=0;i<4;i++){
       var x=9+i*87;
-      out+='<rect x="'+x+'" y="93" width="79" height="112" rx="5" fill="'+(['#8BC9C3','#E9AF8D','#B5A8D5','#C2A8CC'][i])+'" stroke="#343668" stroke-width="4"/>'+
+      out+='<g class="shop-branch shop-branch-'+i+'"><ellipse cx="'+(x+39)+'" cy="203" rx="38" ry="5" fill="#141B40" opacity=".36"/>'+ 
+        '<rect x="'+x+'" y="93" width="79" height="112" rx="5" fill="'+(['#8BC9C3','#E9AF8D','#B5A8D5','#C2A8CC'][i])+'" stroke="#343668" stroke-width="4"/>'+ 
         '<path d="M'+(x-3)+' 112h85v19q-9 8-17 0-9 8-17 0-9 8-17 0-9 8-17 0-9 8-17 0Z" fill="'+(['#F9D46E','#E9858C','#77CAC0','#B7DA7A'][i])+'" stroke="#363566" stroke-width="3"/>'+
-        '<rect x="'+(x+8)+'" y="145" width="39" height="50" fill="#51608F" stroke="#303C70" stroke-width="3"/>'+
+        '<rect class="shop-window" x="'+(x+8)+'" y="145" width="39" height="50" fill="#51608F" stroke="#303C70" stroke-width="3"/>'+ 
+        '<path d="M'+(x+12)+' 180h31M'+(x+20)+' 149v42" stroke="#91BED0" stroke-width="1.5" opacity=".7"/>'+ 
+        '<rect x="'+(x+15)+'" y="157" width="23" height="13" rx="2" fill="#9FB4C8"/><path d="M'+(x+18)+' 173h17" stroke="#F0D7A2" stroke-width="2"/>'+ 
         '<rect x="'+(x+54)+'" y="145" width="16" height="60" fill="#69567D" stroke="#303C70" stroke-width="3"/>'+
         '<rect x="'+(x+4)+'" y="101" width="71" height="16" rx="4" fill="#3B3E78"/>'+
-        '<text x="'+(x+39)+'" y="113" text-anchor="middle" fill="#FFF0C0" font-size="8" font-weight="bold">'+BRANCH[i][0]+'</text>';
+        '<text x="'+(x+39)+'" y="113" text-anchor="middle" fill="#FFF0C0" font-size="8" font-weight="bold">'+BRANCH[i][0]+'</text>'+ 
+        '<circle class="shop-sign-light" cx="'+(x+68)+'" cy="106" r="2" fill="#8FF0BE" filter="url(#shopglow)"/></g>';
     }
-    out+='<path d="M0 205h360" stroke="#303A6B" stroke-width="5"/><circle cx="178" cy="213" r="13" fill="#FFD46B" stroke="#414177" stroke-width="3"/>'+
-      '<text x="178" y="217" text-anchor="middle" fill="#473766" font-size="12" font-weight="bold">؟</text>';
+    out+='</g><g class="shop-activity" data-feel-layer="front">'+ 
+      '<g class="shop-customer customer-one"><circle cx="48" cy="197" r="5" fill="#C6886A"/><path d="M48 202v18m-8-11 8-5 8 5m-8 11-7 12m7-12 7 12" stroke="#26305A" stroke-width="4" stroke-linecap="round" fill="none"/></g>'+ 
+      '<g class="shop-customer customer-two"><circle cx="294" cy="196" r="5" fill="#A86D58"/><path d="M294 201v19m-8-10 8-6 9 6m-9 10-7 12m7-12 8 12" stroke="#5A3664" stroke-width="4" stroke-linecap="round" fill="none"/></g>'+ 
+      '<g class="shop-scooter"><path d="M118 226h33l10-12h17" stroke="#E98D78" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="125" cy="229" r="6" fill="#171D42" stroke="#9DA7C4" stroke-width="2"/><circle cx="168" cy="229" r="6" fill="#171D42" stroke="#9DA7C4" stroke-width="2"/><rect x="139" y="208" width="17" height="13" rx="2" fill="#E6B565"/></g>'+ 
+      '</g><g class="shop-mystery" data-feel-layer="front"><circle cx="218" cy="219" r="14" fill="#FFD46B" stroke="#414177" stroke-width="3" filter="url(#shopglow)"/>'+ 
+      '<text x="218" y="224" text-anchor="middle" fill="#473766" font-size="14" font-weight="bold">؟</text></g>';
     sky.innerHTML=out;
   }
 

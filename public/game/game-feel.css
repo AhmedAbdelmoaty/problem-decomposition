@@ -248,6 +248,38 @@
 
 @keyframes feel-panel-led{from{opacity:.55;filter:brightness(.9)}to{opacity:1;filter:brightness(1.25)}}
 
+/* Sales mission: the overview and drill-down scenes feel like one lively district. */
+.stage.commerce .shop-sky,.stage.commerce .shop-floor,.stage.commerce .shop-fronts,
+.stage.commerce .shop-activity,.stage.commerce .shop-lights,.stage.commerce .shop-mystery{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.stage.commerce .shop-sky{animation:feel-shop-sky 9s ease-in-out infinite alternate}
+.stage.commerce .shop-cloud-one{animation:feel-shop-cloud 13s linear infinite alternate}
+.stage.commerce .shop-cloud-two{animation:feel-shop-cloud 17s linear infinite alternate-reverse}
+.stage.commerce .shop-bulb{animation:feel-shop-bulb 1.8s ease-in-out infinite alternate;filter:drop-shadow(0 0 4px currentColor)}
+.stage.commerce .shop-bulb:nth-of-type(3n){animation-delay:-.65s}
+.stage.commerce .shop-bulb:nth-of-type(3n+1){animation-delay:-1.2s}
+.stage.commerce .shop-sign-light{animation:feel-shop-sign 1.3s steps(2,end) infinite}
+.stage.commerce .shop-window{filter:drop-shadow(0 0 4px #9ed7e077)}
+.stage.commerce .shop-customer{transform-box:fill-box;transform-origin:50% 100%;animation:feel-shop-customer 2.5s ease-in-out infinite alternate}
+.stage.commerce .customer-two{animation-delay:-1.1s}
+.stage.commerce .shop-scooter{animation:feel-shop-scooter 6.5s ease-in-out infinite}
+.stage.commerce .shop-mystery{animation:feel-shop-mystery 1.4s ease-in-out infinite alternate}
+.stage.commerce .scene-lamp{filter:drop-shadow(0 0 5px #efd59a)}
+.stage.commerce .scene-label{font-weight:800;fill:#fff1cd}
+.stage.commerce[data-scene^="branch"] .scene-window,
+.stage.commerce[data-scene^="product"] .scene-window,
+.stage.commerce[data-scene^="pay"] .scene-window{filter:drop-shadow(0 0 4px #ffe39566)}
+
+@keyframes feel-shop-sky{from{transform:scale(1)}to{transform:scale(1.012) translateY(-1px)}}
+@keyframes feel-shop-cloud{from{transform:translateX(-8px)}to{transform:translateX(14px)}}
+@keyframes feel-shop-bulb{from{opacity:.58}to{opacity:1}}
+@keyframes feel-shop-sign{0%,88%,100%{opacity:1}90%,94%{opacity:.25}}
+@keyframes feel-shop-customer{from{transform:translateY(0) rotate(-.5deg)}to{transform:translateY(-2px) rotate(.7deg)}}
+@keyframes feel-shop-scooter{0%,18%{transform:translateX(-125px)}48%,70%{transform:translateX(0)}100%{transform:translateX(165px)}}
+@keyframes feel-shop-mystery{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-4px) rotate(2deg)}}
+
 @keyframes feel-sky-drift{
   from{transform:translate3d(-2px,0,0) scale(1.005)}
   to{transform:translate3d(3px,1px,0) scale(1.012)}
@@ -379,4 +411,7 @@
     animation:none!important;
   }
   .gauge-panel::after{animation:none!important}
+  .stage.commerce .shop-sky,.stage.commerce .shop-cloud-one,.stage.commerce .shop-cloud-two,
+  .stage.commerce .shop-bulb,.stage.commerce .shop-sign-light,.stage.commerce .shop-customer,
+  .stage.commerce .shop-scooter,.stage.commerce .shop-mystery{animation:none!important}
 }
