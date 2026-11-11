@@ -3,20 +3,20 @@
 
   var DIR='audio/ambient/';
   var MIX={
-    cityBed:{file:'freesound_community-night-ambience-17064.mp3',volume:.48},
-    cityCrickets:{file:'schorsch1964-night-atmosphere-with-crickets-374652.mp3',volume:.26},
-    shop:{file:'alex_jauk-supermarket-ambience-sounds-518582.mp3',volume:.42}
+    cityBed:{file:'freesound_community-night-ambience-17064.mp3',volume:1},
+    cityCrickets:{file:'schorsch1964-night-atmosphere-with-crickets-374652.mp3',volume:.68},
+    shop:{file:'alex_jauk-supermarket-ambience-sounds-518582.mp3',volume:.88}
   };
   var EVENTS={
     bats:[
-      {file:'bat_01.flac',volume:.42},
-      {file:'bat_03.flac',volume:.38}
+      {file:'bat_01.flac',volume:.9},
+      {file:'bat_03.flac',volume:.82}
     ],
     dogs:[
-      {file:'dragon-studio-distant-dog-barking-472373.mp3',volume:.48,weight:4},
-      {file:'dbsound-dog-barking-in-distant-502553.mp3',volume:.22,weight:1}
+      {file:'dragon-studio-distant-dog-barking-472373.mp3',volume:1,weight:4},
+      {file:'dbsound-dog-barking-in-distant-502553.mp3',volume:.58,weight:1}
     ],
-    power:{file:'killconfirmed.wav',volume:.42}
+    power:{file:'killconfirmed.wav',volume:.9}
   };
 
   var unlocked=false;
@@ -63,7 +63,7 @@
 
   function target(key,value){
     loops[key].dataset.target=String(Math.max(0,value));
-    if(value>0&&unlocked&&soundOn()) playLoop(key);
+    if(value>0&&soundOn()) playLoop(key);
   }
 
   function fadeMix(){
@@ -144,12 +144,12 @@
     var L=snapshot&&snapshot.L;
     var view=String(G.view||'home');
     var active=view==='play'||view==='why'||view==='lost';
-    var next=active&&L?(L.city?'city':'shop'):'silent';
+    var next=view==='home'?'city':(active&&L?(L.city?'city':'shop'):'silent');
     var winNow=view==='won'&&lastView!=='won';
     if(winNow&&L&&L.city) powerReturn();
     setScene(next);
 
-    var duck=voicePlaying()?.18:1;
+    var duck=voicePlaying()?.12:1;
     var lost=view==='lost'?.62:1;
     target('cityBed',scene==='city'?MIX.cityBed.volume*duck*lost:0);
     target('cityCrickets',scene==='city'?MIX.cityCrickets.volume*duck*lost:0);
