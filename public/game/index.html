@@ -303,11 +303,10 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   <div class="play-column">
   <div class="mission-hud" id="missionHud" hidden aria-label="معلومات المهمة">
     <div class="hud-actions">
-      <button class="hud-button" id="homeNav" type="button" aria-label="الرجوع للرئيسية"><span aria-hidden="true">⌂</span><b>الرئيسية</b></button>
       <button class="hud-button" id="backNav" type="button" aria-label="الرجوع خطوة"><span aria-hidden="true">↩</span><b>رجوع</b></button>
     </div>
-    <div class="hud-energy" aria-live="polite">
-      <span class="hud-energy-label">طاقة التحليل <strong id="hudCount"></strong></span>
+    <div class="hud-energy" id="hudEnergy" aria-live="polite">
+      <span class="hud-energy-label"><span aria-hidden="true">⚡</span><strong id="hudCount"></strong></span>
       <span class="pips breaker-rail" id="hudPips" aria-hidden="true"></span>
     </div>
     <div class="timer" id="timer" hidden>
@@ -327,7 +326,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   var game=document.getElementById('game'), stage=document.getElementById('stage'), actor=document.getElementById('actor'), stageTitle=document.getElementById('stageTitle'),
       roundEl=document.getElementById('round'), app=document.getElementById('app'),
       missionHud=document.getElementById('missionHud'), hudPips=document.getElementById('hudPips'), hudCount=document.getElementById('hudCount'),
-      homeNav=document.getElementById('homeNav'), backNav=document.getElementById('backNav'),
+      hudEnergy=document.getElementById('hudEnergy'), backNav=document.getElementById('backNav'),
       timerEl=document.getElementById('timer'), tfill=document.getElementById('tfill'),
       tnum=document.getElementById('tnum'), tlabel=document.getElementById('tlabel'),
       muteBtn=document.getElementById('mute'), sky=document.getElementById('sky'),
@@ -930,9 +929,10 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     timerEl.hidden=!show;
     if(!show){stage.classList.remove('hot');return;}
     var r=Math.max(0,remMs()), s=Math.ceil(r/1000), hot=!!S.deadline&&s<=10;
-    tlabel.textContent=L.city?'الوقت الباقي قبل ما يفصل المولّد':'الوقت الباقي';
+    tlabel.textContent=L.city?'المولّد':'الوقت';
     tfill.style.width=(r/(L.time*1000)*100)+'%';
-    tnum.textContent=s;
+    tnum.textContent=s+'ث';
+    timerEl.setAttribute('aria-label',(L.city?'الوقت الباقي قبل ما يفصل المولّد: ':'الوقت الباقي: ')+s+' ثانية');
     timerEl.classList.toggle('hot',hot);
     stage.classList.toggle('hot',hot);
     if(hot&&s>0&&s!==S.lastSec){S.lastSec=s;tone(s<=3?1175:880,0.07,'square',0.05);if(s<=3) buzz(30);}
@@ -1194,8 +1194,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     missionHud.classList.toggle('has-timer',race());
     for(var i=0;i<L.budget;i++) h+='<span class="pip'+(i<left()?' left':'')+'"></span>';
     hudPips.innerHTML=h;
-    hudCount.textContent=Math.max(0,left())+' من '+L.budget;
-    backNav.disabled=G.view==='play'&&S.path.length<2;
+    hudCount.textContent=Math.max(0,left())+'/'+L.budget;
+    hudEnergy.setAttribute('aria-label','متبقي '+Math.max(0,left())+' تفكيكات من '+L.budget);
+    var atRoot=G.view==='play'&&S.path.length<2;
+    backNav.innerHTML=atRoot?'<span aria-hidden="true">⌂</span><b>الرئيسية</b>':'<span aria-hidden="true">↩</span><b>رجوع</b>';
+    backNav.setAttribute('aria-label',atRoot?'الرجوع للرئيسية':'الرجوع خطوة');
   }
   function crumbs(){
     if(S.path.length<2) return '';
@@ -1581,7 +1584,6 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     return false;
   }
   missionHud.addEventListener('click',function(e){
-    if(e.target.closest('#homeNav')){sfx('back');leaveCurrentMission(true);return;}
     if(e.target.closest('#backNav')){sfx('back');navigateBack(false);}
   });
   window.addEventListener('popstate',function(){
