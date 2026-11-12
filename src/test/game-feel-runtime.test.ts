@@ -198,8 +198,9 @@ describe("game feel presentation runtime", () => {
     const html = readFileSync(gameHtmlPath, "utf8");
     const css = readFileSync(feelCssPath, "utf8");
 
-    expect(html).toContain('<div class="bar breaker-hud">');
-    expect(html).toContain('<span class="pips breaker-rail" aria-hidden="true">');
+    expect(html).toContain('<div class="mission-hud" id="missionHud"');
+    expect(html).toContain('<div class="hud-energy" id="hudEnergy"');
+    expect(html).toContain('<span class="pips breaker-rail" id="hudPips" aria-hidden="true">');
     expect(html).toContain('<nav class="crumbs power-route" aria-label="مكانك في التفكيك">');
     expect(html).toContain('<section class="panel gauge-panel">');
     expect(html).toContain('data-act="tile"');

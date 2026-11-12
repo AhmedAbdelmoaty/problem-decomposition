@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Lalezar&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="game-feel.css">
+<link rel="stylesheet" href="guided-tutorial.css">
 <script src="scene-art.js"></script>
 <style>
 :root{
@@ -1197,8 +1198,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     hudCount.textContent=Math.max(0,left())+'/'+L.budget;
     hudEnergy.setAttribute('aria-label','متبقي '+Math.max(0,left())+' تفكيكات من '+L.budget);
     var atRoot=G.view==='play'&&S.path.length<2;
-    backNav.innerHTML=atRoot?'<span aria-hidden="true">⌂</span><b>الرئيسية</b>':'<span aria-hidden="true">↩</span><b>رجوع</b>';
-    backNav.setAttribute('aria-label',atRoot?'الرجوع للرئيسية':'الرجوع خطوة');
+    backNav.hidden=atRoot;
+    backNav.innerHTML='<span aria-hidden="true">↩</span><b>رجوع</b>';
+    backNav.setAttribute('aria-label','الرجوع خطوة');
   }
   function crumbs(){
     if(S.path.length<2) return '';
@@ -1245,10 +1247,9 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       '<p>الكهربا قطعت عن المدينة كلها. مهمتك تلاقي السبب بالتحليل، والتحليل معناه التفكيك: تاخد الرقم العام وتقسّمه لحد ما السبب يبان.</p>'+
       '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+ 
       '<p class="say note tutorial-note">ابدأ من الرقم العام، قارنه بالمعتاد، وبعدها فكّكه خطوة خطوة. كل اختيار بيقرّبك من مكان المشكلة أو يرجّعك خطوة للمراجعة.</p>'+ 
-      (lock?'<button class="btn" data-act="mode" data-m="learn">وضع التعلّم: من غير عدّاد</button>'+
-        '<button class="btn ghost" data-act="mode" data-m="race" disabled>وضع التحدي: بعدّاد</button>'
-       :'<button class="btn" data-act="mode" data-m="race">وضع التحدي: بعدّاد</button>')+
-      (lock?'<p class="say note">وضع التحدي بيتفتح بعد ما تخلّص وضع التعلّم.</p>':'')+'</section>';
+      (lock?'<button class="btn" data-tutorial-start>ابدأ التحليل</button>'
+       :'<button class="btn" data-act="mode" data-m="race">ابدأ التحدي</button><button class="btn ghost" data-tutorial-replay>راجع طريقة اللعب</button>')+
+      (lock?'<p class="say note">هتبدأ بمهمة قصيرة موجهة، وبعدها القرار هيبقى قرارك.</p>':'')+'</section>';
   }
 
   function renderPlay(){
@@ -1597,11 +1598,16 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   });
 
   window.dcDebug={state:function(){return {G:G,S:S,L:L};}};
+  window.DCTutorialBridge={
+    startTutorial:function(){G.mode='learn';G.pts=[0,0,0,0];G.stars=[0,0,0,0];startLevel(0);},
+    startChallenge:function(){G.learned=true;store('dc_learned','1');G.mode='race';G.pts=[0,0,0,0];G.stars=[0,0,0,0];startLevel(0);}
+  };
   drawSky(null);
   render();
 })();
 </script>
 <script src="game-feel.js"></script>
 <script src="ambient-audio.js"></script>
+<script src="guided-tutorial.js"></script>
 </body>
 </html>
