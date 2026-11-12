@@ -421,8 +421,8 @@
   box-shadow:inset 4px 0 0 #eab950;
 }
 
-@keyframes feel-outcome-enter{from{opacity:.35;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
-@keyframes feel-loss-card{from{opacity:.45;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes feel-outcome-enter{from{opacity:1;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes feel-loss-card{from{opacity:1;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes feel-stars-celebrate{0%{opacity:.2;transform:scale(.7) rotate(-4deg)}65%{transform:scale(1.15) rotate(2deg)}100%{opacity:1;transform:none}}
 
 @keyframes feel-sky-drift{
