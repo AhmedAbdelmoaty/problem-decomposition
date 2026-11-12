@@ -461,6 +461,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     ,businessCustomerReturn:{file:'business/07-customer-return.mp3',ms:2720}
     ,businessNoHope:{file:'business/08-shop-no-hope.mp3',ms:4800}
     ,businessWinSaveDay:{file:'business/10-shop-win-save-day.mp3',ms:4800}
+    ,businessAngryFindHelp:{file:'business/11-shop-angry-find-help.mp3',ms:3280}
+    ,businessWinBranches:{file:'business/12-shop-win-branches.mp3',ms:4080}
     ,cityAngryDoSomethingV2:{file:'city/18-angry-electrician-v2.mp3',ms:3680}
   };
   var voiceTrack=null, voiceTimers=[];
@@ -968,6 +970,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       {who:'صاحب المحل',role:'shopkeeper',t:'المحل مفتوح من بدري ولسه أول فاتورة ما اتعملتش.',audio:'businessFirstInvoice'},
       {who:'صاحب المحل',role:'shopkeeper',t:'الفرع ده كان شغال كويس الأسبوع اللي فات.',audio:'businessBranchLastWeek'},
       {who:'راجل متعصب',role:'angryResident',t:'يا عم خلّصنا، الفروع مستنية، في حاجة مستخبية في التفاصيل.',audio:'businessDetails'},
+      {who:'صاحب المحل',role:'shopkeeper',t:'يا باشا! لو مش عارف، قول لنا نجيب حد يساعدنا!',audio:'businessAngryFindHelp'},
       {who:'زبونة',role:'customer',t:'معلش أنا هرجع أبص تاني بعد شوية.',audio:'businessCustomerReturn'},
       {who:'صاحب المحل',role:'shopkeeper',t:'يا أستاذ إحنا مش هنقضي اليوم كله مستنيين كده.',audio:'businessWaiting'},
       {who:'موظفة المحل',role:'cashier',t:'من بدري وإحنا بنقول يمكن الدنيا تتحرك… مفيش فايدة.',audio:'businessNoHope'}
@@ -1397,7 +1400,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     }else{
       var bo=pick([
         {who:'موظفة المحل',role:'cashier',t:'أهو البيع اتحرك تاني، الحمد لله، ربنا يكرمك يا باشا.',audio:'businessWin'},
-        {who:'صاحب المحل',role:'shopkeeper',t:'تسلم إيدك يا باشا، كده نقدر نكمّل اليوم بدل ما نقفله بخسارة.',audio:'businessWinSaveDay'}
+        {who:'صاحب المحل',role:'shopkeeper',t:'تسلم إيدك يا باشا، كده نقدر نكمّل اليوم بدل ما نقفله بخسارة.',audio:'businessWinSaveDay'},
+        {who:'صاحب المحل',role:'shopkeeper',t:'أهو الفروع بدأت تبيع تاني! ربنا يفتحها في وشّك يا راجل!',audio:'businessWinBranches'}
       ]);
       playVoice(bo.audio,function(){showBubble(bo,true,VOICE[bo.audio].ms);});
     }
