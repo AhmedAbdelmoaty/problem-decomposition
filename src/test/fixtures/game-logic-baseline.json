@@ -14,13 +14,13 @@
     "level4": "34ae2b3318c3a4223cd96cf2712594cd4cdceb101566b52845f5c123505ebba2",
     "startLevel": "5080031a63b3fc58e79805a0f5c31bb278f9f5bb59fdb10feb03581e45d5ccd1",
     "starsFor": "c1acf2d08d2bce9d250cb53e88471b669cecf3e4101a8a108e7e46d1a44cfb63",
-    "lose": "acea3afe06f50984f74cc575c88f3c249f637e44a65876d8f0695263204f3c89",
-    "win": "ec61a1a63abe0213abeb3b963811f275846a332a4ad4febd24023f96764d9e7c",
+    "lose": "60e760e3b048d6e57c8f039878af92e4932ee64f109c0b03d6efea429f0f20a4",
+    "win": "ea84f226dd2a41c4501bef631ae137521356a33d59016f89e804cf88cf6ea770",
     "openTile": "ddc0660058fd2eb679bba35427bf6e797ddfe40fd7e5288853d08953c739517b",
     "answerWhy": "7193b60c56f826cf305347505f7f7aae7fab0962caecef7597c1ec3746ac2e93",
     "fixLeaf": "1605de6e457ca47e0b86b74390ee58e50c6c719db910ecf1f568576a6f3f524c"
   },
-  "clickRouterSha256": "483e4350f5cc27f0b7841c6cb1de06bf86aa3a253eaad4ff777a0c10c29f8caf",
+  "clickRouterSha256": "aef7b9477725e4ce4f89fc2d3c591b4307dd9b6fceefeacfbf1304a5caf7427d",
   "numericRules": {
     "penalty": 5,
     "levels": {

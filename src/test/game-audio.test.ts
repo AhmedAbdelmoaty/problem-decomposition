@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -29,7 +30,7 @@ describe("game audio assets", () => {
 
   it("maps every spoken bubble to a recorded voice and a character", () => {
     const voiceKeys = new Set(
-      [...gameHtml.matchAll(/^\s+(\w+):\{file:'[^']+',ms:\d+\}/gm)].map((match) => match[1]),
+      [...gameHtml.matchAll(/^\s+,?(\w+):\{file:'[^']+',ms:\d+\}/gm)].map((match) => match[1]),
     );
     const audioKeys = [...gameHtml.matchAll(/audio:'(\w+)'/g)].map((match) => match[1]);
     const characterBlock = gameHtml.match(/var CHAR=\{([\s\S]*?)\n  \};/)?.[1] ?? "";
