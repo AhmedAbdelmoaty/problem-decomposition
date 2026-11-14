@@ -940,13 +940,13 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     if(hot&&s>0&&s!==S.lastSec){S.lastSec=s;tone(s<=3?1175:880,0.07,'square',0.05);if(s<=3) buzz(30);}
   }
   function lose(reason){
-    G.view='lost';S.why=reason;hush();bubble.hidden=true;sfx('lose');
-    if(L&&L.city){
-      var o=pick(CITY_LOSE_LINES);
-      voiceTimers.push(setTimeout(function(){
-        playVoice(o.audio,function(){showBubble(o,false,0);},hideBubble);
-      },350));
-    }
+    G.view='lost';
+    S.why=reason;
+    hush();
+    voiceTimers.forEach(clearTimeout);
+    voiceTimers=[];
+    if(bubble){bubble.hidden=true;bubble.classList.remove('show');}
+    sfx('lose');
   }
   setInterval(function(){
     if(!inPlay()||!race()) return;
@@ -1322,9 +1322,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     return h;
   }
   function renderLost(){
-    var shop=L&&!L.city, title=shop?'البضاعة باظت والمحل بيخسر!':'المولد فصل والمستشفى ضلمت!', speaker=shop?'صاحب المحل:':'رئيس المدينة:';
+    var shop=L&&!L.city;
+    var title=shop?'البضاعة باظت والمحل بيخسر!':'المولد فصل والمستشفى ضلمت!';
+    var speakerName=shop?'صاحب المحل':'رئيس المدينة';
     var quote=shop?'«يا حسرة على الفلوس والبضاعة اللي رقدت في التلاجة! التحليل البايظ ده ودانا في داهية.. ركّز في الأرقام اللي بتوقع المبيعات!»':'«يا فالح! المستشفى غرقت في الضلمة والأجهزة وقفت وإنت لسه بتخمن؟! التحليل مش حادي بادي، بص في الأدلة الأول!»';
-    return '<section class="panel mt outcome-panel outcome-loss '+(shop?'outcome-loss-shop':'outcome-loss-city')+'"><h2>'+title+'</h2><div class="loss-character-row"><div class="loss-avatar">'+characterSvg(shop?'shopkeeper':'mayor')+'</div><div class="loss-speech"><span class="loss-speaker">'+speaker+'</span><p class="loss-quote">'+quote+'</p></div></div>'+
+    return '<section class="panel mt outcome-panel outcome-loss '+(shop?'outcome-loss-shop':'outcome-loss-city')+'">'+
+      '<h2 class="loss-title">'+title+'</h2><div class="loss-novel-stage"><div class="loss-avatar-box">'+characterSvg(shop?'shopkeeper':'mayor')+'</div><div class="loss-speech-bubble"><span class="loss-speaker-badge">'+speakerName+'</span><p class="loss-quote-text">'+quote+'</p></div></div>'+
       '<p class="lesson">'+(shop?'قارن أرقام الفروع والمنتجات بالمعتاد قبل ما تختار.':'اقرأ الأدلة كويس، وقارن الرقم بالمعتاد.. ما تفتحش كل مكان عشوائي.')+'</p><div class="outcome-actions"><button class="btn btn-loss-retry" data-auto-focus data-act="retry">'+(shop?'راجع الحسابات وجرّب تاني':'شغّل المولد وجرّب تاني')+'</button></div></section>';
   }
   function renderCityComplete(){return '<section class="panel mt outcome-panel outcome-win"><h2>مبروك! أنقذت المدينة وحليت أزمة المستشفى</h2><p class="lesson">المستوى الأول اكتمل بنجاح. المستوى التاني: أزمة مبيعات المتجر الكبير</p><div class="outcome-actions"><button class="btn" data-auto-focus data-act="start-sales">ادخل المستوى التاني (أزمة المبيعات)</button></div></section>';}

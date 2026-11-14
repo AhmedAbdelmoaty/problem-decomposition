@@ -246,3 +246,16 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.26;b
 .btn-loss-retry:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 7px 0 #782222,0 10px 24px rgba(235,77,75,.5)!important}
 @media(max-width:640px){.loss-character-row{flex-direction:column;text-align:center;gap:8px;padding:10px}.loss-avatar{width:60px;height:60px}.loss-quote{font-size:.86rem}.btn-loss-retry{font-size:.92rem!important;padding:10px 16px!important;width:100%}}
 @media(max-width:600px){.stage{max-height:120px!important;overflow:hidden!important}.stage svg#sky{max-height:115px!important;min-height:0!important}}
+
+.outcome-loss .loss-title{color:#ff5252!important;font-size:1.3rem!important;font-weight:900!important;text-shadow:0 0 16px rgba(255,82,82,.45),0 2px 4px rgba(0,0,0,.9)!important;margin-bottom:12px!important}
+.loss-novel-stage{display:flex;align-items:center;gap:14px;margin:14px 0;position:relative}
+.loss-avatar-box{flex-shrink:0;width:72px;height:72px;border-radius:50%;background:#262a4a;border:3px solid #ff7979;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.5);animation:loss-avatar-bounce .4s cubic-bezier(.17,.89,.32,1.28) both}
+.loss-avatar-box svg{width:100%;height:100%;transform:scale(1.15) translateY(4px)}
+@keyframes loss-avatar-bounce{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.loss-speech-bubble{flex:1;position:relative;background:linear-gradient(145deg,#fffbf0,#f7e5be);border:3px solid #b33939;border-radius:18px 18px 18px 4px;padding:11px 14px 10px;box-shadow:0 6px 0 #6e1f1f,0 10px 20px rgba(0,0,0,.4);animation:loss-bubble-pop .32s cubic-bezier(.17,.89,.32,1.28) .1s both}
+@keyframes loss-bubble-pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.loss-speech-bubble::before{content:"";position:absolute;bottom:14px;inset-inline-start:-11px;width:14px;height:14px;background:#fffbf0;border-bottom:3px solid #b33939;border-inline-start:3px solid #b33939;transform:rotate(45deg)}
+.loss-speaker-badge{display:inline-block;font-size:.76rem;font-weight:900;color:#a32828;margin-bottom:3px}
+.loss-quote-text{margin:0;font-size:.88rem;font-weight:800;line-height:1.6;color:#241d3b!important}
+.panel .usual{color:#f6e083!important;font-weight:800!important;text-shadow:0 1px 2px rgba(0,0,0,.5)!important}
+.gauge-panel .figs{background:rgba(20,22,46,.45);border-radius:12px;padding:6px 10px}

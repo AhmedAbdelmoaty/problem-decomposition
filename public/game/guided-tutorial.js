@@ -168,6 +168,9 @@
     return document.querySelector('[data-act="why"][data-i="'+index+'"]');
   }
   function guideWhy(){targetCoach(correctWhy,'قارن الرقم بالمعتاد وشوف مين اللي شاذ. اختار السبب اللي الدليل بيدعمه.',true,function(){
+    closeCoach(true);
+    if(root){root.hidden=true;root.innerHTML='';}
+    document.body.classList.remove('dc-tutorial-open','dc-tutorial-active');
     waitFor(function(){return document.getElementById('btnReadyRecap');},function(button){button.addEventListener('click',showRecap,{once:true});});
   });}
   function showRecap(){
