@@ -151,8 +151,11 @@
   function guidePath(){
     var st=state();if(!st) return;
     if(st.G.view==='why'){guideWhy();return;}
-    if(st.G.view==='won'){showRecap();return;}
-    var depth=st.S.path.length, text=depth===2?'كل خطوة بتقسم الجزء اللي قدامك لتفاصيل أصغر. قارن كل جزء بالمعتاد، وكمّل ورا الاختلاف.':'تمام، كده ضيّقنا نطاق البحث. كمّل بنفس الطريقة.';
+    if(st.G.view==='won') return;
+    var depth=st.S.path.length;
+    var text=depth===2
+      ?'قارن كل رقم بالمعتاد بتاعه.. الجزء اللي تلاقي فيه هبوط مفاجئ عن الطبيعي هو اللي تدوس عليه عشان تفككه وتعرف إيه اللي جواه.'
+      :'تمام، كده ضيّقنا دايرة البحث. كمّل بنفس الطريقة ورا الجزء المختلف لحد ما نوصل لمصدر الخلل.';
     targetCoach(correctTile,text,true,function(){
       var nextState=state();
       if(nextState&&nextState.G.view==='why'){guideWhy();return;}
@@ -164,9 +167,11 @@
     var index=st.S.whyLeaf.why.opts.findIndex(function(option){return option[1];});
     return document.querySelector('[data-act="why"][data-i="'+index+'"]');
   }
-  function guideWhy(){targetCoach(correctWhy,'عرفت المشكلة فين. دلوقتي اختار السبب اللي الدليل بيدعمه.',true,showRecap);}
+  function guideWhy(){targetCoach(correctWhy,'قارن الرقم بالمعتاد وشوف مين اللي شاذ. اختار السبب اللي الدليل بيدعمه.',true,function(){
+    waitFor(function(){return document.getElementById('btnReadyRecap');},function(button){button.addEventListener('click',showRecap,{once:true});});
+  });}
   function showRecap(){
-    closeCoach(false);ensureRoot();root.hidden=false;document.body.classList.add('dc-tutorial-open');
+    closeCoach(false);ensureRoot();root.hidden=false;document.body.classList.remove('dc-tutorial-active');document.body.classList.add('dc-tutorial-open');
     root.innerHTML='<section class="dc-recap" role="dialog" aria-modal="true" aria-label="اكتمل شرح اللعبة"><article class="dc-recap-card"><div class="dc-recap-icon">✓</div><h2>جاهز للتحليل</h2><div class="dc-recap-flow"><span>قارن</span><b>←</b><span>اقرأ</span><b>←</b><span>اختار البُعد</span><b>←</b><span>ضيّق النطاق</span><b>←</b><span>حدّد السبب</span></div><p>كده عرفت طريقة التحقيق. المرة الجاية مفيش أسهم… القرار قرارك.</p><button class="dc-recap-start" type="button">ابدأ التحدي</button></article></section>';
     var button=root.querySelector('.dc-recap-start');button.focus();button.addEventListener('click',function(){
       try{localStorage.setItem(KEY,'1');}catch(e){}
