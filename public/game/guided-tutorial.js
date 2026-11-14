@@ -133,7 +133,7 @@
     if(tnum) tnum.textContent='60ث';if(tlabel) tlabel.textContent='المولّد';
     targetCoach(function(){return document.getElementById('timer');},'ده الوقت الباقي قبل ما المولد يفصل. لازم تخلص المهمة قبل ما يوصل للصفر.',false,guideEnergy);
   }
-  function guideEnergy(){targetCoach(function(){return document.getElementById('hudEnergy');},'كل لمبة فرصة تفكيك. اختار خطواتك على أساس المعلومات اللي معاك.',false,guideMetric);}
+  function guideEnergy(){targetCoach(function(){return document.getElementById('hudEnergy');},'كل خانة طاقة خضرا فرصة تفكيك. اختار خطواتك على أساس المعلومات اللي معاك.',false,guideMetric);}
   function guideBack(){targetCoach(function(){return document.getElementById('backNav');},'دخلت في طريق مش مفيد؟ ارجع خطوة وجرب اتجاه تاني.',false,guideBreadcrumb);}
   function guideBreadcrumb(){targetCoach(function(){return document.querySelector('.crumbs');},'ده الطريق اللي مشيت فيه. تقدر تضغط على أي خطوة فاتت عشان ترجع لها مباشرة.',false,guidePath);}
   function guideMetric(){targetCoach(function(){return document.querySelector('.gauge-panel');},'قارن الحالي بالمعتاد، بس ما تحكمش من الرقم العام لوحده.',false,guideEvidence);}
