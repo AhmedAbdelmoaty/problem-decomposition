@@ -62,7 +62,7 @@
     document.body.classList.remove('dc-tutorial-open');
   }
   function coachMarkup(text,interactive){
-    return '<div class="dc-coach-shade dc-shade-top"></div><div class="dc-coach-shade dc-shade-right"></div><div class="dc-coach-shade dc-shade-bottom"></div><div class="dc-coach-shade dc-shade-left"></div><div class="dc-coach-cutout"></div><aside class="dc-coach-bubble" role="dialog" aria-live="polite"><p>'+esc(text)+'</p></aside><span class="dc-coach-ripple"></span><span class="dc-coach-pointer">'+pointerSvg()+'</span>';
+    return '<div class="dc-coach-shade dc-shade-top"></div><div class="dc-coach-shade dc-shade-right"></div><div class="dc-coach-shade dc-shade-bottom"></div><div class="dc-coach-shade dc-shade-left"></div><div class="dc-coach-cutout"></div><aside class="dc-coach-bubble" role="dialog" aria-live="polite"><span class="dc-coach-tag">🔍 توجيه المحقق</span><p data-full="'+esc(text)+'">'+esc(text)+'</p>'+(interactive?'<span class="dc-coach-hint">👆 اضغط على المكان المضيء</span>':'<button type="button" class="dc-coach-next">فهمت ←</button>')+'</aside><span class="dc-coach-ripple"></span><span class="dc-coach-pointer">'+pointerSvg()+'</span>';
   }
   function readingTime(text){return Math.max(3000,Math.min(6000,1700+String(text).trim().split(/\s+/).length*180));}
   function positionCoach(){
@@ -80,11 +80,14 @@
     var bw=bubble.offsetWidth||340, bh=bubble.offsetHeight||120, gap=18, bx=Math.max(8,Math.min(vw-bw-8,left+(right-left-bw)/2)), by;
     if(vh-bottom>bh+gap) by=bottom+gap;
     else if(top>bh+gap) by=top-bh-gap;
-    else by=Math.max(8,Math.min(vh-bh-8,(vh-bh)/2));
+    else by=(top>vh-bottom)?8:vh-bh-8;
+    by=Math.max(8,Math.min(vh-bh-8,by));
     bubble.style.left=bx+'px';bubble.style.top=by+'px';
     var cx=(left+right)/2, cy=(top+bottom)/2, ripple=root.querySelector('.dc-coach-ripple');
     if(ripple){ripple.style.left=cx+'px';ripple.style.top=cy+'px';}
-    pointer.style.left=Math.max(2,Math.min(vw-46,cx-14))+'px';pointer.style.top=Math.max(2,Math.min(vh-54,cy-4))+'px';
+    var w=right-left, px=w>160?left+Math.min(56,w*.2):cx-10, py=bottom-22;
+    pointer.style.left=Math.max(2,Math.min(vw-46,px))+'px';pointer.style.top=Math.max(2,Math.min(vh-54,py))+'px';
+    if(ripple){ripple.style.left=(Math.max(2,Math.min(vw-46,px))+12)+'px';ripple.style.top=(bottom-16)+'px';}
     root.classList.add('is-placed');
   }
   function showCoach(target,text,interactive,next){
@@ -93,12 +96,11 @@
     root.classList.remove('is-placed');root.hidden=false;root.innerHTML=coachMarkup(text,interactive);document.body.classList.add('dc-tutorial-open','dc-tutorial-active');
     var rect=target.getBoundingClientRect();
     if(rect.bottom<0||rect.top>window.innerHeight) target.scrollIntoView({behavior:'smooth',block:'center'});
-    positionCoach();setTimeout(function(){positionCoach();requestAnimationFrame(function(){var bubble=root.querySelector('.dc-coach-bubble');if(bubble) bubble.classList.add('is-ready');});target.focus({preventScroll:true});},260);
+    positionCoach();setTimeout(function(){positionCoach();requestAnimationFrame(function(){var bubble=root.querySelector('.dc-coach-bubble');if(bubble){bubble.classList.add('is-ready');typeIn(bubble);}});target.focus({preventScroll:true});},260);
     function relayout(){cancelAnimationFrame(layoutFrame);layoutFrame=requestAnimationFrame(positionCoach);}
     window.addEventListener('resize',relayout);window.addEventListener('scroll',relayout,true);
     cleanupTarget=function(){window.removeEventListener('resize',relayout);window.removeEventListener('scroll',relayout,true);};
     if(interactive){
-      bubbleTimer=setTimeout(function(){var bubble=root.querySelector('.dc-coach-bubble');if(bubble) bubble.classList.add('is-dismissed');},readingTime(text));
       var done=function(){
         var pointer=root.querySelector('.dc-coach-pointer');if(pointer) pointer.classList.add('is-tapping');
         setTimeout(function(){closeCoach(false);next();},180);
@@ -106,11 +108,21 @@
       target.addEventListener('click',done,{once:true});
       var oldCleanup=cleanupTarget;cleanupTarget=function(){oldCleanup();target.removeEventListener('click',done);};
     }else{
-      bubbleTimer=setTimeout(function(){
-        var bubble=root.querySelector('.dc-coach-bubble');if(bubble) bubble.classList.add('is-dismissed');
+      var btn=root.querySelector('.dc-coach-next');
+      btn.addEventListener('click',function(){
+        var bubble=root.querySelector('.dc-coach-bubble'),pp=bubble&&bubble.querySelector('p');
+        if(pp&&pp._typing){finishType(pp);return;}
+        if(bubble) bubble.classList.add('is-dismissed');
         setTimeout(function(){closeCoach(false);next();},170);
-      },readingTime(text));
+      });
     }
+  }
+  function finishType(p){clearInterval(p._typing);p._typing=0;p.textContent=p.getAttribute('data-full');}
+  function typeIn(bubble){
+    var p=bubble.querySelector('p');if(!p) return;var full=p.getAttribute('data-full'),i=0;
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){p.textContent=full;return;}
+    p.style.minHeight='';p.textContent=full;var h=p.offsetHeight;p.style.minHeight=h+'px';p.textContent='';positionCoach();
+    p._typing=setInterval(function(){i+=2;p.textContent=full.slice(0,i);if(i>=full.length) finishType(p);},22);
   }
   function targetCoach(find,text,interactive,next){waitFor(find,function(target){showCoach(target,text,interactive,next);});}
   function startGuided(){
@@ -121,7 +133,7 @@
     if(tnum) tnum.textContent='60ث';if(tlabel) tlabel.textContent='المولّد';
     targetCoach(function(){return document.getElementById('timer');},'ده الوقت الباقي قبل ما المولد يفصل. لازم تخلص المهمة قبل ما يوصل للصفر.',false,guideEnergy);
   }
-  function guideEnergy(){targetCoach(function(){return document.getElementById('hudEnergy');},'كل لمبة فرصة تفكيك. اختار خطواتك على أساس المعلومات اللي معاك.',false,guideMetric);}
+  function guideEnergy(){targetCoach(function(){return document.getElementById('hudEnergy');},'كل خانة طاقة خضرا فرصة تفكيك. اختار خطواتك على أساس المعلومات اللي معاك.',false,guideMetric);}
   function guideBack(){targetCoach(function(){return document.getElementById('backNav');},'دخلت في طريق مش مفيد؟ ارجع خطوة وجرب اتجاه تاني.',false,guideBreadcrumb);}
   function guideBreadcrumb(){targetCoach(function(){return document.querySelector('.crumbs');},'ده الطريق اللي مشيت فيه. تقدر تضغط على أي خطوة فاتت عشان ترجع لها مباشرة.',false,guidePath);}
   function guideMetric(){targetCoach(function(){return document.querySelector('.gauge-panel');},'قارن الحالي بالمعتاد، بس ما تحكمش من الرقم العام لوحده.',false,guideEvidence);}
