@@ -34,7 +34,7 @@
     return '<svg viewBox="0 0 180 360" aria-hidden="true"><ellipse cx="90" cy="344" rx="65" ry="12" fill="#05091f" opacity=".38"/><path d="M27 340q6-126 63-126t63 126" fill="#5a8a92" stroke="#262954" stroke-width="8"/><path d="M58 220l32 35 33-35" fill="#f5f0de" stroke="#262954" stroke-width="5"/><ellipse cx="90" cy="135" rx="54" ry="70" fill="#c78764" stroke="#262954" stroke-width="8"/><path d="M37 112Q40 51 90 49q51 2 54 63-20-25-54-25-33 0-53 25Z" fill="#292b4b" stroke="#262954" stroke-width="8"/><path d="M54 132h27m18 0h27M81 132h18" stroke="#30345a" stroke-width="6"/><circle cx="68" cy="145" r="19" fill="none" stroke="#30345a" stroke-width="5"/><circle cx="112" cy="145" r="19" fill="none" stroke="#30345a" stroke-width="5"/><ellipse cx="68" cy="146" rx="5" ry="7" fill="#222647"/><ellipse cx="112" cy="146" rx="5" ry="7" fill="#222647"/><path d="M70 184q20 9 40 0" fill="none" stroke="#693b42" stroke-width="6" stroke-linecap="round"/><path d="M113 250l45-18 14 78-47 13Z" fill="#fff5d6" stroke="#262954" stroke-width="7"/><path d="M130 264h22m-19 15h22m-18 15h21" stroke="#b48a59" stroke-width="4"/></svg>';
   }
   function pointerSvg(){
-    return '<svg viewBox="0 0 64 72" aria-hidden="true"><path d="M8 35h15M12 22l11 7M12 48l11-7" stroke="#ffd15f" stroke-width="5" stroke-linecap="round"/><path d="M29 59c-5-7-6-16-3-23l5-20c1-5 9-4 8 2l-2 12 11-6c5-3 9 4 5 7l-6 5 5 2c4 2 3 8-1 9l-6 1 3 5c3 5-3 10-7 6l-4-4-1 8c-1 7-3 12-7 16Z" fill="#d9956f" stroke="#292b55" stroke-width="4" stroke-linejoin="round"/></svg>';
+    return '<svg viewBox="0 0 48 56" aria-hidden="true"><path d="M14 4c3 0 5 2 5 5v14l2-1c3-1 5 0 6 2 2-1 5-1 6 2 2-1 6 0 6 3v10c0 8-6 14-14 14h-3c-5 0-8-2-11-6L4 35c-2-3 1-6 4-4l3 3V9c0-3 1-5 3-5z" fill="#fff3d6" stroke="#2a2550" stroke-width="3" stroke-linejoin="round"/><path d="M19 23v8M27 24v7M33 27v5" stroke="#2a2550" stroke-width="2.4" stroke-linecap="round"/><path d="M12 7q2-1 4 0" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/></svg>';
   }
   function openStory(index){
     ensureRoot();closeCoach(false);
@@ -62,7 +62,7 @@
     document.body.classList.remove('dc-tutorial-open');
   }
   function coachMarkup(text,interactive){
-    return '<div class="dc-coach-shade dc-shade-top"></div><div class="dc-coach-shade dc-shade-right"></div><div class="dc-coach-shade dc-shade-bottom"></div><div class="dc-coach-shade dc-shade-left"></div><div class="dc-coach-cutout"></div><aside class="dc-coach-bubble" role="dialog" aria-live="polite"><p>'+esc(text)+'</p></aside><span class="dc-coach-pointer">'+pointerSvg()+'</span>';
+    return '<div class="dc-coach-shade dc-shade-top"></div><div class="dc-coach-shade dc-shade-right"></div><div class="dc-coach-shade dc-shade-bottom"></div><div class="dc-coach-shade dc-shade-left"></div><div class="dc-coach-cutout"></div><aside class="dc-coach-bubble" role="dialog" aria-live="polite"><p>'+esc(text)+'</p></aside><span class="dc-coach-ripple"></span><span class="dc-coach-pointer">'+pointerSvg()+'</span>';
   }
   function readingTime(text){return Math.max(3000,Math.min(6000,1700+String(text).trim().split(/\s+/).length*180));}
   function positionCoach(){
@@ -82,20 +82,18 @@
     else if(top>bh+gap) by=top-bh-gap;
     else by=Math.max(8,Math.min(vh-bh-8,(vh-bh)/2));
     bubble.style.left=bx+'px';bubble.style.top=by+'px';
-    var px,py,dir;
-    if(left>62){px=left-55;py=top+(bottom-top-52)/2;dir='right';}
-    else if(vw-right>62){px=right+5;py=top+(bottom-top-52)/2;dir='left';}
-    else if(top>60){px=left+(right-left-44)/2;py=top-55;dir='down';}
-    else{px=left+(right-left-44)/2;py=bottom+4;dir='up';}
-    pointer.style.left=Math.max(2,Math.min(vw-54,px))+'px';pointer.style.top=Math.max(2,Math.min(vh-60,py))+'px';pointer.dataset.dir=dir;
+    var cx=(left+right)/2, cy=(top+bottom)/2, ripple=root.querySelector('.dc-coach-ripple');
+    if(ripple){ripple.style.left=cx+'px';ripple.style.top=cy+'px';}
+    pointer.style.left=Math.max(2,Math.min(vw-46,cx-14))+'px';pointer.style.top=Math.max(2,Math.min(vh-54,cy-4))+'px';
+    root.classList.add('is-placed');
   }
   function showCoach(target,text,interactive,next){
     ensureRoot();closeCoach(false);
     currentTarget=target;target.classList.add('dc-tutorial-target');
-    root.hidden=false;root.innerHTML=coachMarkup(text,interactive);document.body.classList.add('dc-tutorial-open','dc-tutorial-active');
+    root.classList.remove('is-placed');root.hidden=false;root.innerHTML=coachMarkup(text,interactive);document.body.classList.add('dc-tutorial-open','dc-tutorial-active');
     var rect=target.getBoundingClientRect();
     if(rect.bottom<0||rect.top>window.innerHeight) target.scrollIntoView({behavior:'smooth',block:'center'});
-    setTimeout(function(){positionCoach();requestAnimationFrame(function(){var bubble=root.querySelector('.dc-coach-bubble');if(bubble) bubble.classList.add('is-ready');});target.focus({preventScroll:true});},260);
+    positionCoach();setTimeout(function(){positionCoach();requestAnimationFrame(function(){var bubble=root.querySelector('.dc-coach-bubble');if(bubble) bubble.classList.add('is-ready');});target.focus({preventScroll:true});},260);
     function relayout(){cancelAnimationFrame(layoutFrame);layoutFrame=requestAnimationFrame(positionCoach);}
     window.addEventListener('resize',relayout);window.addEventListener('scroll',relayout,true);
     cleanupTarget=function(){window.removeEventListener('resize',relayout);window.removeEventListener('scroll',relayout,true);};
