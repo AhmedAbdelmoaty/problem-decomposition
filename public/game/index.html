@@ -340,6 +340,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function fmt(n){return n.toLocaleString('en-US');}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function store(k,v){try{if(v===undefined) return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){}return null;}
+  function loadProgress(){try{return Object.assign({tutorial_completed:false,level1_cleared:false,current_level:0},JSON.parse(store('problem_solver_progress')||'{}'));}catch(e){return {tutorial_completed:false,level1_cleared:false,current_level:0};}}
+  function saveProgress(change){var progress=loadProgress();Object.keys(change).forEach(function(key){progress[key]=change[key];});store('problem_solver_progress',JSON.stringify(progress));return progress;}
 
   /* ---------- shared leaderboard (lights up only where the viewer may use it) ---------- */
   var DB=null, UID=null;
@@ -900,7 +902,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
 
   /* ---------- state ---------- */
   var PENALTY=5;
-  var G={view:'home',mode:null,li:0,pts:[0,0,0,0,0],stars:[0,0,0,0,0],learned:store('dc_learned')==='1',answer:'',compared:false};
+  var G={view:'home',mode:null,li:0,pts:[0,0,0,0,0],stars:[0,0,0,0,0],learned:loadProgress().tutorial_completed||store('tutorial_completed')==='true'||store('dc_learned')==='1',answer:'',compared:false};
   var B={state:'idle',rows:[],saved:false,saving:false,err:false};
   var S={}, L=null;
 
@@ -926,16 +928,24 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function startTimer(){if(race()&&!S.deadline){S.deadline=Date.now()+L.time*1000;S.lastSec=null;}}
   function remMs(){return S.deadline?S.deadline-Date.now():L.time*1000;}
   function inPlay(){return G.view==='play'||G.view==='why';}
+  function pauseGameTimer(){if(inPlay()&&race()&&S.deadline&&!S.pausedAt) S.pausedAt=Date.now();}
+  function resumeGameTimer(){if(S.pausedAt){S.deadline+=Date.now()-S.pausedAt;S.pausedAt=0;S.lastSec=null;paintTimer();}}
+  function activeAudio(){var tracks=[].slice.call(document.querySelectorAll('audio'));Object.keys(samplePools).forEach(function(key){samplePools[key].forEach(function(track){if(tracks.indexOf(track)<0) tracks.push(track);});});if(voiceTrack&&tracks.indexOf(voiceTrack)<0) tracks.push(voiceTrack);return tracks;}
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){pauseGameTimer();activeAudio().forEach(function(audio){if(!audio.paused){audio.dataset.wasPlaying='true';audio.pause();}});}
+    else{if(inPlay()&&race()) resumeGameTimer();activeAudio().forEach(function(audio){if(audio.dataset.wasPlaying==='true'){delete audio.dataset.wasPlaying;audio.play().catch(function(){});}});}
+  });
   function paintTimer(){
     var show=inPlay()&&race();
     timerEl.hidden=!show;
-    if(!show){stage.classList.remove('hot');return;}
+    if(!show){stage.classList.remove('hot');timerEl.classList.remove('timer-urgent');return;}
     var r=Math.max(0,remMs()), s=Math.ceil(r/1000), hot=!!S.deadline&&s<=10;
     tlabel.textContent=L.city?'المولّد':'الوقت';
     tfill.style.width=(r/(L.time*1000)*100)+'%';
     tnum.textContent=s+'ث';
     timerEl.setAttribute('aria-label',(L.city?'الوقت الباقي قبل ما يفصل المولّد: ':'الوقت الباقي: ')+s+' ثانية');
     timerEl.classList.toggle('hot',hot);
+    timerEl.classList.toggle('timer-urgent',!!S.deadline&&s<=15);
     stage.classList.toggle('hot',hot);
     if(hot&&s>0&&s!==S.lastSec){S.lastSec=s;tone(s<=3?1175:880,0.07,'square',0.05);if(s<=3) buzz(30);}
   }
@@ -1232,8 +1242,8 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     if(c.inert){cls+=' still';dis=' disabled';}
     if(c.done){cls+=' clear';tag='<span class="tag">اتصلّح</span>';dis=' disabled';}
     else if(c.cleared){cls+=' clear';tag='<span class="tag">سليم</span>';dis=' disabled';}
-    else if(c.opened){tag='<span class="tag">متفكّك قبل كده</span>';}
-    return '<button class="'+cls+'" data-act="tile" data-i="'+i+'"'+dis+'>'+
+    else if(c.opened){cls+=' is-decomposed';tag='<span class="tag">🔍 متفكّك قبل كده</span>';}
+    return '<button class="'+cls+'" data-act="tile" data-i="'+i+'"'+(c.opened?' data-decomposed="true"':'')+dis+'>'+
       '<span class="n">'+esc(c.name)+'</span>'+
       '<span class="v">'+fmt(c.actual)+'</span>'+
       '<span class="u">المعتاد '+fmt(c.normal)+'</span>'+tag+'</button>';
@@ -1244,22 +1254,21 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function msgHtml(){return '<p class="msg'+(S.good?' good':'')+'" role="status" aria-live="polite">'+esc(S.msg)+'</p>';}
 
   function renderHome(){
-    var lock=!G.learned;
+    var progress=loadProgress(), lock=!G.learned;
     return '<section class="panel mt"><h2>مستشفى المدينة على المولّد</h2>'+
       '<p>الكهربا قطعت عن المدينة كلها. مهمتك تلاقي السبب بالتحليل، والتحليل معناه التفكيك: تاخد الرقم العام وتقسّمه لحد ما السبب يبان.</p>'+
       '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+ 
       '<p class="say note tutorial-note">ابدأ من الرقم العام، قارنه بالمعتاد، وبعدها فكّكه خطوة خطوة. كل اختيار بيقرّبك من مكان المشكلة أو يرجّعك خطوة للمراجعة.</p>'+ 
-      (lock?'<button class="btn" data-tutorial-start>ابدأ التحليل</button>'
-       :'<button class="btn" data-act="mode" data-m="race">ابدأ التحدي</button><button class="btn ghost" data-tutorial-replay>راجع طريقة اللعب</button>')+
-      (lock?'<p class="say note">هتبدأ بمهمة قصيرة موجهة، وبعدها القرار هيبقى قرارك.</p>':'')+'</section>';
+      '<button class="btn '+(lock?'':'ghost')+'" id="btn-practice" data-tutorial-start>ابدأ التدريب (طريقة اللعب)</button>'+
+      (progress.level1_cleared?'<p class="progress-complete">✅ المستوى الأول: مكتمل</p><button class="btn" data-act="resume-sales">استكمال اللعب: أزمة المبيعات</button>':'<button class="btn '+(lock?'challenge-locked':'')+'" id="btn-challenge" data-act="mode" data-m="race"'+(lock?' disabled':'')+'>'+(lock?'🔒 وضع التحدي (يفتح بعد إتمام التدريب)':'وضع التحدي')+'</button>')+
+      '<p class="say note">هتبدأ بمهمة قصيرة موجهة، وبعدها القرار هيبقى قرارك.</p><button class="progress-reset" data-act="reset-progress">إعادة تعيين التقدم</button></section>';
   }
 
   function renderPlay(){
     var n=cur(), h=pips()+crumbs()+panel(n);
     if(n===L.root){
       var answered=!!(L.guess&&S.guessed!==null);
-      if(answered) h+='<details class="clue-drawer"><summary>راجع وصف المهمة والأدلة</summary><p class="say">'+esc(L.story)+'</p>'+cluesHtml()+'</details>';
-      else h+='<p class="say">'+esc(L.story)+'</p>'+cluesHtml();
+      h+='<p class="say">'+esc(L.story)+'</p>'+cluesHtml();
       if(L.guess&&S.guessed===null){
         h+='<p class="say">الشركة بتقول الإجمالي طبيعي. إنت شايف إيه؟</p><div class="opts">'+
           '<button class="btn ghost" data-act="guess" data-g="0">فعلاً مفيش مشكلة</button>'+
@@ -1268,8 +1277,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
         if(L.guess) h+='<p class="say">'+(S.guessed?'بالظبط. ':'السكان بيشتكوا، يبقى فيه مشكلة والرقم مخبّيها. ')+'الإجمالي ممكن يبان طبيعي وجوّاه حاجتين عكس بعض.</p>';
         var dims=n.children;
         if(dims.length===1){
-          h+='<div class="answer-transition"><span class="transition-check" aria-hidden="true">✓</span><span>خلصت التقدير الأول. دلوقتي ابدأ تضيق مكان المشكلة.</span></div>'+
-            '<button class="btn primary-next" data-auto-focus data-act="tile" data-i="0">'+esc(dims[0].label)+'</button>';
+          h+='<button class="btn primary-next" data-auto-focus data-act="tile" data-i="0">'+esc(dims[0].label)+'</button>';
         }else{
           h+='<p class="say">حسب الأدلة: تفكّك '+L.metric+' بإيه؟</p><div class="opts">';
           dims.forEach(function(d,i){
@@ -1288,7 +1296,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
       }else{
         h+='<p class="say note">قارن كل رقم بالمعتاد بتاعه، ودوس على اللي عايز تفكّكه'+(kids[0].zone!=null?'. تقدر كمان تدوس على الحي في صورة المدينة':'')+'.</p>';
       }
-      if(S.good) h+='<p class="say note next-step">السبب اتصلّح، لكن المهمة لسه مستمرة. ارجع خطوة وكمل البحث عن باقي الاختلاف.</p>';
+      if(S.good) h+='<aside class="mayor-alert" role="status"><b>رئيس المدينة:</b> عاش! صلحنا سبب.. بس الاستهلاك لسه عالي والمستشفى في خطر! ارجع ودوّر على السبب التاني بسرعة!</aside>';
       h+='<div class="grid">'+kids.map(tile).join('')+'</div>';
       if(kids[0].inert) h+='<button class="btn" data-act="up" data-i="0">ارجع للأدلة وجرّب بُعد تاني</button>';
     }
@@ -1325,12 +1333,12 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     var shop=L&&!L.city;
     var title=shop?'البضاعة باظت والمحل بيخسر!':'المولد فصل والمستشفى ضلمت!';
     var speakerName=shop?'صاحب المحل':'رئيس المدينة';
-    var quote=shop?'«يا حسرة على الفلوس والبضاعة اللي رقدت في التلاجة! التحليل البايظ ده ودانا في داهية.. ركّز في الأرقام اللي بتوقع المبيعات!»':'«يا فالح! المستشفى غرقت في الضلمة والأجهزة وقفت وإنت لسه بتخمن؟! التحليل مش حادي بادي، بص في الأدلة الأول!»';
+    var quote=shop?'«ضيعت شقايا يا باشا! البضاعة عَفّنت في المخازن وإنت بتقولي كله تمام؟! ركّز في الفروع اللي واقعة قبل ما نعلّق لافتة للإيجار!»':'«يا فالح! المستشفى غرقت في الضلمة والأجهزة وقفت وإنت لسه بتخمن؟! التحليل مش حادي بادي، بص في الأدلة الأول!»';
     return '<section class="panel mt outcome-panel outcome-loss '+(shop?'outcome-loss-shop':'outcome-loss-city')+'">'+
       '<h2 class="loss-title">'+title+'</h2><div class="loss-novel-stage"><div class="loss-avatar-box">'+characterSvg(shop?'shopkeeper':'mayor')+'</div><div class="loss-speech-bubble"><span class="loss-speaker-badge">'+speakerName+'</span><p class="loss-quote-text">'+quote+'</p></div></div>'+
       '<p class="lesson">'+(shop?'قارن أرقام الفروع والمنتجات بالمعتاد قبل ما تختار.':'اقرأ الأدلة كويس، وقارن الرقم بالمعتاد.. ما تفتحش كل مكان عشوائي.')+'</p><div class="outcome-actions"><button class="btn btn-loss-retry" data-auto-focus data-act="retry">'+(shop?'راجع الحسابات وجرّب تاني':'شغّل المولد وجرّب تاني')+'</button></div></section>';
   }
-  function renderCityComplete(){return '<section class="panel mt outcome-panel outcome-win"><h2>مبروك! أنقذت المدينة وحليت أزمة المستشفى</h2><p class="lesson">المستوى الأول اكتمل بنجاح. المستوى التاني: أزمة مبيعات المتجر الكبير</p><div class="outcome-actions"><button class="btn" data-auto-focus data-act="start-sales">ادخل المستوى التاني (أزمة المبيعات)</button></div></section>';}
+  function renderCityComplete(){return '<section class="city-cleared" role="status"><div class="city-cleared-medal">⭐⭐⭐<span>وسام محقق المدينة</span></div><div class="city-cleared-stage"><div class="city-cleared-mayor">'+characterSvg('mayor')+'</div><div class="city-cleared-speech"><b>رئيس المدينة</b><p>«الله ينور عليك يا بطل! المستشفى رجع لها النور والمرضى في أمان بفضلك!»</p></div></div><p class="city-cleared-hook">عاجل: صاحب المتجر الكبير بيستغيث! مبيعات الفروع بتنهار وعايزين تحليلك العبقري!</p><button class="btn city-cleared-button" data-auto-focus data-act="start-sales">انتقل إلى أزمة مبيعات المتجر ➔</button></section>';}
   function renderFinalVictory(){var stars=G.stars.reduce(function(a,b){return a+b;},0),points=G.pts.reduce(function(a,b){return a+b;},0);return '<section class="panel mt outcome-panel outcome-win"><h2>كبير المحللين 👑</h2><div class="pts">'+fmt(points)+' نقطة</div><p>'+stars+' من '+((NL-1)*3)+' نجمة</p><p class="lesson">أنقذت المدينة وفهمت أزمة المبيعات. التحليل الصح يبدأ بالأدلة وينتهي بالسبب.</p><div class="outcome-actions"><button class="btn" data-auto-focus data-act="home">الرئيسية</button></div></section>';}
 
   var IDEAS=['الرقم العام ممكن يبان طبيعي وهو مخبّي مشكلة، فلازم أفكّكه.',
@@ -1449,7 +1457,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     G.stars[G.li]=st;
     G.pts[G.li]=st*100+firsts*50+S.secLeft*10;
     G.view='won';
-    if(G.mode==='learn'){G.learned=true;store('dc_learned','1');}
+    if(G.mode==='learn'){G.learned=true;store('dc_learned','1');store('tutorial_completed','true');saveProgress({tutorial_completed:true,current_level:1});}
     hush();
     if(L.city){
       var o=pick(CITY_WIN_LINES);
@@ -1525,15 +1533,16 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     if(act!=='tile'&&act!=='why') sfx(act==='up'?'back':'click');
     if(act==='mode'){G.mode=b.getAttribute('data-m');G.pts=[0,0,0,0,0];G.stars=[0,0,0,0,0];startLevel(G.mode==='race'?1:0);return;}
     if(act==='next'){
-      if(G.li===2){G.view='cityComplete';render();window.scrollTo({top:0,behavior:'smooth'});return;}
+      if(G.li===2){saveProgress({tutorial_completed:true,level1_cleared:true,current_level:2});G.view='cityComplete';render();window.scrollTo({top:0,behavior:'smooth'});return;}
       if(G.li<NL-1){startLevel(G.li+1);return;}
       G.view='final';
       render();window.scrollTo({top:0,behavior:'smooth'});return;
     }
-    if(act==='start-sales'){startLevel(3);return;}
+    if(act==='start-sales'||act==='resume-sales'){saveProgress({tutorial_completed:true,level1_cleared:true,current_level:3});startLevel(3);return;}
     if(act==='retry'){startLevel(G.li);return;}
     if(act==='compare'){var ta=document.getElementById('answer');G.answer=ta?String(ta.value||'').trim():'';G.compared=true;render();return;}
-    if(act==='unlock'){G.learned=true;store('dc_learned','1');G.view='home';L=null;drawSky(null);render();return;}
+    if(act==='unlock'){G.learned=true;store('dc_learned','1');store('tutorial_completed','true');G.view='home';L=null;drawSky(null);render();return;}
+    if(act==='reset-progress'){store('problem_solver_progress',JSON.stringify({tutorial_completed:false,level1_cleared:false,current_level:0}));store('tutorial_completed','false');store('dc_learned','0');G.learned=false;G.view='home';L=null;drawSky(null);render();return;}
     if(act==='save'){
       var inp=document.getElementById('nick'), nm=inp?String(inp.value||'').trim().slice(0,20):'';
       if(!nm) nm='لاعب';
@@ -1608,7 +1617,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   window.dcDebug={state:function(){return {G:G,S:S,L:L};}};
   window.DCTutorialBridge={
     startTutorial:function(){G.mode='learn';G.pts=[0,0,0,0,0];G.stars=[0,0,0,0,0];startLevel(0);},
-    startChallenge:function(){G.learned=true;store('dc_learned','1');G.mode='race';G.pts=[0,0,0,0,0];G.stars=[0,0,0,0,0];startLevel(1);}
+    startChallenge:function(){G.learned=true;store('dc_learned','1');store('tutorial_completed','true');saveProgress({tutorial_completed:true,current_level:1});G.mode='race';G.pts=[0,0,0,0,0];G.stars=[0,0,0,0,0];startLevel(1);}
   };
   drawSky(null);
   render();
