@@ -14,7 +14,7 @@ describe("guided analytical onboarding", () => {
   it("loads a separate accessible tutorial layer with the approved start action", () => {
     expect(html).toContain('href="guided-tutorial.css"');
     expect(html).toContain('src="guided-tutorial.js"');
-    expect(html).toContain("ابدأ التحليل");
+    expect(html).toContain("ابدأ التدريب");
     expect(runtime).toContain('role="dialog"');
     expect(runtime).toContain('aria-live="polite"');
   });

@@ -41,7 +41,7 @@
     index=index||0;
     var beat=STORY[index], dots=STORY.map(function(_,i){return '<i class="'+(i===index?'active':'')+'"></i>';}).join('');
     root.hidden=false;document.body.classList.add('dc-tutorial-open');
-    root.innerHTML='<section class="dc-briefing" role="dialog" aria-modal="true" aria-label="مقدمة المهمة"><div class="dc-briefing-stage">'+
+    root.innerHTML='<section class="dc-briefing" role="dialog" aria-modal="true" aria-label="مقدمة المهمة"><div class="dc-briefing-backdrop" aria-hidden="true"></div><div class="dc-briefing-stage">'+
       '<div class="dc-story-character analyst '+(beat.role==='analyst'?'is-speaking':'')+'">'+analystSvg()+'</div>'+
       '<article class="dc-dialogue" data-speaker="'+beat.role+'"><span class="dc-speaker">'+esc(beat.speaker)+'</span><p>'+esc(beat.text)+'</p><div class="dc-dialogue-footer"><span class="dc-story-progress">'+dots+'</span>'+
       (index<STORY.length-1?'<button class="dc-story-next" type="button">كمّل</button>':'<button class="dc-story-start" type="button">ابدأ التحليل</button>')+

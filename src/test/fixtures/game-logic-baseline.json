@@ -1,6 +1,6 @@
 {
   "sourceCommit": "e32f35b",
-  "dataCopySha256": "19ee986b29d463e49ba72e119b62339629f2411b02b426145c02d4ef1a53850b",
+  "dataCopySha256": "07117deb07c416ebabdc025a4e5566c5c9117d44b545269c1e5a04ea55c6d1e7",
   "functions": {
     "why": "7f25601164dcaab1f395f65112c44a85066cac3805be0bd37f592abd9333e622",
     "plant": "d488c8e40dcb10d47b2a441114f8e8c1a43bb0b0f16a430889e62a90ad042fd5",
@@ -11,16 +11,16 @@
     "level1": "c6acb550002386b0d1cc9def0ed44d22120b29f318adfb1e625a131accbe12de",
     "level2": "c651d68b02bbdc19a9e68969dfe0330360bfddffd860bf8fadd97105d1cf4765",
     "level3": "284cfbcc406c16fdbabfb8cc83a03c72dce10e3a08ffda60b05f10ce25324bb0",
-    "level4": "34ae2b3318c3a4223cd96cf2712594cd4cdceb101566b52845f5c123505ebba2",
+    "level4": "72ca2bb3f2ae5768912cb4f02cd198be0617576e5bc2e1e2acf65f9854cf5235",
     "startLevel": "5080031a63b3fc58e79805a0f5c31bb278f9f5bb59fdb10feb03581e45d5ccd1",
     "starsFor": "c1acf2d08d2bce9d250cb53e88471b669cecf3e4101a8a108e7e46d1a44cfb63",
-    "lose": "60e760e3b048d6e57c8f039878af92e4932ee64f109c0b03d6efea429f0f20a4",
-    "win": "ca6d0d3ab8b33cf8a0d988735ac95241e8b080eb1020a609428a186a15a9c710",
+    "lose": "6dd8bbbb78c89185be4870e861cb3e731e565b14db06f314c155c069a282b0c3",
+    "win": "80d3e87dc6276ebdc89aaa33bb42220be7fb8b9fc857d123226739e2698e8992",
     "openTile": "ddc0660058fd2eb679bba35427bf6e797ddfe40fd7e5288853d08953c739517b",
     "answerWhy": "7193b60c56f826cf305347505f7f7aae7fab0962caecef7597c1ec3746ac2e93",
     "fixLeaf": "1605de6e457ca47e0b86b74390ee58e50c6c719db910ecf1f568576a6f3f524c"
   },
-  "clickRouterSha256": "aef7b9477725e4ce4f89fc2d3c591b4307dd9b6fceefeacfbf1304a5caf7427d",
+  "clickRouterSha256": "568afbd3895b9c9b4df89e7553a877214da3fbf69bffce622dc907d051b73ee2",
   "numericRules": {
     "penalty": 5,
     "levels": {

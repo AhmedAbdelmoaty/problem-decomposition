@@ -1327,6 +1327,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     S.fixed.forEach(function(f){h+='<li>'+esc(f.where)+': '+esc(f.cause)+'.</li>';});
     h+='</ul><p class="lesson">'+esc(L.lesson)+'</p>'+
       '<div class="outcome-actions">'+(learn?'<button class="btn" id="btnReadyRecap">فهمت طريقة الحل.. للمرحلة التالية</button>':'<button class="btn" data-auto-focus data-act="next">المهمة اللي بعدها</button>')+'</div></section>';
+    if(learn) saveProgress({tutorial_completed:true,current_level:1});
     return h;
   }
   function renderLost(){
@@ -1457,7 +1458,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
     G.stars[G.li]=st;
     G.pts[G.li]=st*100+firsts*50+S.secLeft*10;
     G.view='won';
-    if(G.mode==='learn'){G.learned=true;store('dc_learned','1');store('tutorial_completed','true');saveProgress({tutorial_completed:true,current_level:1});}
+    if(G.mode==='learn'){G.learned=true;store('dc_learned','1');store('tutorial_completed','true');}
     hush();
     if(L.city){
       var o=pick(CITY_WIN_LINES);
