@@ -62,7 +62,7 @@
     document.body.classList.remove('dc-tutorial-open');
   }
   function coachMarkup(text,interactive){
-    return '<div class="dc-coach-shade dc-shade-top"></div><div class="dc-coach-shade dc-shade-right"></div><div class="dc-coach-shade dc-shade-bottom"></div><div class="dc-coach-shade dc-shade-left"></div><div class="dc-coach-cutout"></div><aside class="dc-coach-bubble" role="dialog" aria-live="polite"><span class="dc-coach-tag">🔍 توجيه المحقق</span><p data-full="'+esc(text)+'"></p>'+(interactive?'<span class="dc-coach-hint">👆 اضغط على المكان المضيء</span>':'<button type="button" class="dc-coach-next">فهمت ←</button>')+'</aside><span class="dc-coach-ripple"></span><span class="dc-coach-pointer">'+pointerSvg()+'</span>';
+    return '<div class="dc-coach-shade dc-shade-top"></div><div class="dc-coach-shade dc-shade-right"></div><div class="dc-coach-shade dc-shade-bottom"></div><div class="dc-coach-shade dc-shade-left"></div><div class="dc-coach-cutout"></div><aside class="dc-coach-bubble" role="dialog" aria-live="polite"><span class="dc-coach-tag">🔍 توجيه المحقق</span><p data-full="'+esc(text)+'">'+esc(text)+'</p>'+(interactive?'<span class="dc-coach-hint">👆 اضغط على المكان المضيء</span>':'<button type="button" class="dc-coach-next">فهمت ←</button>')+'</aside><span class="dc-coach-ripple"></span><span class="dc-coach-pointer">'+pointerSvg()+'</span>';
   }
   function readingTime(text){return Math.max(3000,Math.min(6000,1700+String(text).trim().split(/\s+/).length*180));}
   function positionCoach(){
@@ -121,7 +121,7 @@
   function typeIn(bubble){
     var p=bubble.querySelector('p');if(!p) return;var full=p.getAttribute('data-full'),i=0;
     if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){p.textContent=full;return;}
-    p.style.minHeight='';p.textContent=full;var h=p.offsetHeight;p.style.minHeight=h+'px';p.textContent='';
+    p.style.minHeight='';p.textContent=full;var h=p.offsetHeight;p.style.minHeight=h+'px';p.textContent='';positionCoach();
     p._typing=setInterval(function(){i+=2;p.textContent=full.slice(0,i);if(i>=full.length) finishType(p);},22);
   }
   function targetCoach(find,text,interactive,next){waitFor(find,function(target){showCoach(target,text,interactive,next);});}
