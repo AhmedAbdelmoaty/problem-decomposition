@@ -562,3 +562,36 @@
   .app[data-feel-view="won"] #game .panel,.app[data-feel-view="lost"] #game .panel,
   .app[data-feel-view="won"] .stars{animation:none!important}
 }
+
+/* ===== Cartoon art assets ===== */
+body{background:#14123a url("PLACEHOLDER_M") center top/cover fixed no-repeat}
+@media (min-width:900px){body{background-image:url("/__l5e/assets-v1/7c58080b-1290-4592-96b3-09467bcd11df/moonlit_neon_neighborhood.webp")}}
+.char-art,.dc-char-img{display:block;width:100%;height:auto;max-height:100%;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
+.dc-story-character .dc-char-img{max-height:min(46vh,380px);width:auto;margin:auto}
+.mission-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.mission-card{margin:0;border-radius:16px;overflow:hidden;border:3px solid #f2c14e;background:#1c1a4a;box-shadow:0 5px 0 #0c0b2a}
+.mission-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.mission-card figcaption{padding:6px 8px;font-weight:800;font-size:.85rem;color:#fff6dc;text-align:center}
+.mission-card.is-locked img{filter:grayscale(.8) brightness(.55)}
+.loss-avatar-box .char-art{max-height:220px;width:auto;margin:auto}
+.city-cleared-mayor .char-art{max-height:240px;width:auto;margin:auto;animation:dc-bob 2.4s ease-in-out infinite}
+.final-art .char-art{max-height:240px;width:auto;margin:10px auto}
+@keyframes dc-bob{50%{transform:translateY(-8px)}}
+.phone-call{min-height:70vh;display:grid;place-items:center;padding:16px}
+.phone-device{width:min(340px,92vw);padding:26px 20px;border-radius:38px;background:linear-gradient(180deg,#1f2a5c,#0d1233);border:6px solid #2d2a66;box-shadow:0 0 0 3px #f2c14e,0 20px 50px rgba(0,0,0,.6);text-align:center;color:#fff6dc}
+.ringing .phone-device{animation:dc-shake .5s ease-in-out infinite}
+@keyframes dc-shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg) translateX(-3px)}75%{transform:rotate(2deg) translateX(3px)}}
+.call-label{font-weight:900;color:#ffd76a;margin:0 0 14px}
+.call-avatar{width:170px;height:170px;margin:0 auto 12px;border-radius:50%;overflow:hidden;background:#fff6dc;border:5px solid #f2c14e;box-shadow:0 0 0 0 rgba(114,232,138,.7);animation:dc-pulse 1.2s infinite}
+.call-avatar .char-art{width:100%;height:100%;object-fit:cover;object-position:top;filter:none}
+@keyframes dc-pulse{70%{box-shadow:0 0 0 22px rgba(114,232,138,0)}100%{box-shadow:0 0 0 0 rgba(114,232,138,0)}}
+.phone-device h2{margin:4px 0;color:#fff}.call-sub{opacity:.85;margin:0 0 18px}
+.call-answer{background:#2fbf5b!important;color:#fff!important;font-size:1.1rem;width:100%}
+.phone-call.talking{grid-template-rows:auto auto;align-content:center;gap:10px;width:100%}
+.call-stage{display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:8px;width:min(760px,100%)}
+.call-char{transition:transform .3s,filter .3s;filter:brightness(.55) saturate(.7);transform:scale(.92)}
+.call-char.is-speaking{filter:none;transform:scale(1.04)}
+.call-char .char-art{max-height:min(42vh,360px);width:auto;margin:auto}
+.call-bubble{width:min(640px,100%);background:linear-gradient(145deg,#fffaf0,#f1dfb8);color:#1d1c4d;border:4px solid #5d568e;border-radius:22px;padding:16px 18px;box-shadow:0 8px 0 #1d1c4d;animation:dc-bubble-pop .3s cubic-bezier(.2,.9,.25,1.15) both}
+.call-bubble b{color:#8a3b12}.call-bubble p{font-weight:800;line-height:1.8;margin:8px 0 12px}
+@media (prefers-reduced-motion:reduce){.ringing .phone-device,.call-avatar,.city-cleared-mayor .char-art{animation:none}}
