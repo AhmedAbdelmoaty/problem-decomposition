@@ -1,0 +1,21 @@
+window.DC_IMG={
+ "01_intro_phone_panic": "/__l5e/assets-v1/4693f6e6-f44d-4fd6-8ef1-ee158ae2f154/01_intro_phone_panic.webp",
+ "01_mayor_briefing_listening": "/__l5e/assets-v1/58909f35-2e2b-472b-94b5-ec7f9baedfaa/01_mayor_briefing_listening.webp",
+ "02_intro_emphasizing": "/__l5e/assets-v1/cdc03ed8-21aa-4a66-9e16-26b03dada792/02_intro_emphasizing.webp",
+ "02_intro_phone_explaining": "/__l5e/assets-v1/a1eb2d5f-a632-4e48-a5b9-04e4ff91997c/02_intro_phone_explaining.webp",
+ "02_shopkeeper_call_listening": "/__l5e/assets-v1/107a7384-8f09-458a-9b4d-8e1c850c084f/02_shopkeeper_call_listening.webp",
+ "03_defeat_furious_red": "/__l5e/assets-v1/e31450af-91c9-4150-a157-98118d19277e/03_defeat_furious_red.webp",
+ "03_shopkeeper_call_explaining": "/__l5e/assets-v1/393d1edc-e7e5-4c93-8dc4-694d5be0ebb6/03_shopkeeper_call_explaining.webp",
+ "04_defeat_furious_red": "/__l5e/assets-v1/8acd1e52-d7b6-4a0e-9d5f-af242e742a81/04_defeat_furious_red.webp",
+ "04_thinking_taking_notes": "/__l5e/assets-v1/0b7588d3-3783-4901-981b-a667c57b37d9/04_thinking_taking_notes.webp",
+ "04_victory_joyful_relief": "/__l5e/assets-v1/12054128-9ccc-4d6c-90e4-9914f0d85590/04_victory_joyful_relief.webp",
+ "05_defeat_panicking": "/__l5e/assets-v1/d37ea366-604b-4ac0-ad2a-0abaee767567/05_defeat_panicking.webp",
+ "06_victory_celebrating": "/__l5e/assets-v1/44d443aa-971c-4955-80c7-967fcbad3eb8/06_victory_celebrating.webp",
+ "mayor_assigning_a_mission": "/__l5e/assets-v1/a8d72f1e-3a3b-4d3c-add7-84109e1321b6/mayor_assigning_a_mission.webp",
+ "moonlit_city_power_outage": "/__l5e/assets-v1/2ecfef39-1d71-45f6-9844-07e4275f0c6f/moonlit_city_power_outage.webp",
+ "moonlit_neon_neighborhood": "/__l5e/assets-v1/7c58080b-1290-4592-96b3-09467bcd11df/moonlit_neon_neighborhood.webp",
+ "panicked_shopkeeper_on_the_phone": "/__l5e/assets-v1/7a8555be-dcb1-4aa6-98c5-c1d72fa699fd/panicked_shopkeeper_on_the_phone.webp",
+ "retail_sales_crash_in_electronics_warehouse": "/__l5e/assets-v1/8ce8ea6d-520e-4803-8d2b-3048314b8806/retail_sales_crash_in_electronics_warehouse.webp",
+ "egyptian_blackout_original_hospital_clear": "/__l5e/assets-v1/1bb9e428-09ca-43a2-9f22-5086c915f2c4/egyptian_blackout_original_hospital_clear.webp",
+ "ringtone": "/__l5e/assets-v1/0f29041c-c4ab-40c4-8cd0-99473e8ad7f3/ringtone.mp3"
+};

@@ -3,10 +3,10 @@
 
   var KEY='dc_guided_onboarding_v1', root=null, currentTarget=null, cleanupTarget=null, layoutFrame=0, bubbleTimer=0;
   var STORY=[
-    {speaker:'رئيس المدينة',role:'mayor',text:'الحقنا يا أستاذ… المدينة غرقت في الضلمة، الشوارع اتعطلت، والمستشفى شغالة على المولد، ومحدش عارف هيستحمل لحد إمتى.'},
-    {speaker:'رئيس المدينة',role:'mayor',text:'شركة الكهربا بتقول إن الرقم الإجمالي مش باين فيه عطل واضح، وفي نفس الوقت شكاوى الناس جاية من كل ناحية… يعني فيه حاجة مستخبية وسط الصورة الكبيرة.'},
-    {speaker:'رئيس المدينة',role:'mayor',text:'ما تلفّش على المدينة عشوائي. خد رقم الشركة وكلام الناس، وضيّق الدايرة حتة حتة؛ كل ما فرق يبان لك امشِ وراه، لحد ما تمسك مكان الخلل قبل المولد ما يفصل.'},
-    {speaker:'المحلل',role:'analyst',text:'حاضر يا ريس. هلمّ الخيوط وأمشي ورا الفرق لحد ما أوصل للعطل.'}
+    {img:'mayor_assigning_a_mission',speaker:'رئيس المدينة',role:'mayor',text:'الحقنا يا أستاذ… المدينة غرقت في الضلمة، الشوارع اتعطلت، والمستشفى شغالة على المولد، ومحدش عارف هيستحمل لحد إمتى.'},
+    {img:'02_intro_emphasizing',speaker:'رئيس المدينة',role:'mayor',text:'شركة الكهربا بتقول إن الرقم الإجمالي مش باين فيه عطل واضح، وفي نفس الوقت شكاوى الناس جاية من كل ناحية… يعني فيه حاجة مستخبية وسط الصورة الكبيرة.'},
+    {img:'mayor_assigning_a_mission',speaker:'رئيس المدينة',role:'mayor',text:'ما تلفّش على المدينة عشوائي. خد رقم الشركة وكلام الناس، وضيّق الدايرة حتة حتة؛ كل ما فرق يبان لك امشِ وراه، لحد ما تمسك مكان الخلل قبل المولد ما يفصل.'},
+    {img:'02_intro_emphasizing',speaker:'المحلل',role:'analyst',text:'حاضر يا ريس. هلمّ الخيوط وأمشي ورا الفرق لحد ما أوصل للعطل.'}
   ];
 
   function esc(value){return String(value).replace(/[&<>"']/g,function(char){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];});}
@@ -27,6 +27,7 @@
     document.body.appendChild(root);
     return root;
   }
+  function artImg(k){var u=(window.DC_IMG||{})[k];return u?'<img class="dc-char-img" src="'+u+'" alt="">':'';}
   function mayorSvg(){
     return '<svg viewBox="0 0 180 360" aria-hidden="true"><ellipse cx="90" cy="344" rx="65" ry="12" fill="#05091f" opacity=".38"/><path d="M26 340q5-126 64-126t64 126" fill="#3f527d" stroke="#262954" stroke-width="8"/><path d="M53 227l37 40 38-40 18 113H35Z" fill="#304165"/><path d="M72 220l18 47 19-47" fill="#fff2d0" stroke="#262954" stroke-width="5"/><path d="M84 258l12 0 9 52-15 18-14-18Z" fill="#c86b50"/><ellipse cx="90" cy="133" rx="56" ry="72" fill="#b97958" stroke="#262954" stroke-width="8"/><path d="M37 112Q40 51 90 49q51 2 54 63-23-24-53-24-31 0-54 24Z" fill="#30314f" stroke="#262954" stroke-width="8"/><path d="M52 130l25 7m28 0 24-7" stroke="#262954" stroke-width="7" stroke-linecap="round"/><ellipse cx="69" cy="148" rx="6" ry="8" fill="#222647"/><ellipse cx="112" cy="148" rx="6" ry="8" fill="#222647"/><path d="M65 186q25-17 51 0" fill="none" stroke="#693b42" stroke-width="7" stroke-linecap="round"/><path d="M64 174q26-13 53 0-27 11-53 0Z" fill="#302d47"/><path class="dc-char-hand" d="M38 253q-26-16-30 2t35 34" fill="#b97958" stroke="#262954" stroke-width="7"/></svg>';
   }
@@ -42,10 +43,10 @@
     var beat=STORY[index], dots=STORY.map(function(_,i){return '<i class="'+(i===index?'active':'')+'"></i>';}).join('');
     root.hidden=false;document.body.classList.add('dc-tutorial-open');
     root.innerHTML='<section class="dc-briefing" role="dialog" aria-modal="true" aria-label="مقدمة المهمة"><div class="dc-briefing-backdrop" aria-hidden="true"></div><div class="dc-briefing-stage">'+
-      '<div class="dc-story-character analyst '+(beat.role==='analyst'?'is-speaking':'')+'">'+analystSvg()+'</div>'+
+      '<div class="dc-story-character analyst '+(beat.role==='analyst'?'is-speaking':'')+'">'+artImg('04_thinking_taking_notes')+'</div>'+
       '<article class="dc-dialogue" data-speaker="'+beat.role+'"><span class="dc-speaker">'+esc(beat.speaker)+'</span><p>'+esc(beat.text)+'</p><div class="dc-dialogue-footer"><span class="dc-story-progress">'+dots+'</span>'+
       (index<STORY.length-1?'<button class="dc-story-next" type="button">كمّل</button>':'<button class="dc-story-start" type="button">ابدأ التحليل</button>')+
-      '</div></article><div class="dc-story-character mayor '+(beat.role==='mayor'?'is-speaking':'')+'">'+mayorSvg()+'</div></div></section>';
+      '</div></article><div class="dc-story-character mayor '+(beat.role==='mayor'?'is-speaking':'')+'">'+artImg(beat.img)+'</div></div></section>';
     var next=root.querySelector(index<STORY.length-1?'.dc-story-next':'.dc-story-start');
     next.focus();
     next.addEventListener('click',function(){
