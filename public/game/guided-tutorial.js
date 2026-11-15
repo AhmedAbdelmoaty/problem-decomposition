@@ -191,6 +191,7 @@
     var cutout=root&&root.querySelector('.dc-coach-cutout');
     if(cutout){cutout.classList.remove('dc-coach-remind');void cutout.offsetWidth;cutout.classList.add('dc-coach-remind');}
   }
+  window.DCTutorialClose=function(){if(root&&root.querySelector('.dc-briefing'))return;closeCoach(true);};
   document.addEventListener('click',interceptGuidedClicks,true);
   document.addEventListener('click',function(event){
     var start=event.target.closest&&event.target.closest('[data-tutorial-start],[data-tutorial-replay]');
