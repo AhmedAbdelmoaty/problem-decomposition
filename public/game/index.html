@@ -374,7 +374,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function tone(f,d,type,vol,when){
     if(!sound) return;
     try{
-      if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C) return;AC=new C();}
+      if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C) return;AC=new C();window.__dcCtx=AC;}
       if(AC.state==='suspended') AC.resume();
       var t=AC.currentTime+(when||0), o=AC.createOscillator(), g=AC.createGain();
       o.type=type||'sine';o.frequency.value=f;
@@ -931,9 +931,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   function pauseGameTimer(){if(inPlay()&&race()&&S.deadline&&!S.pausedAt) S.pausedAt=Date.now();}
   function resumeGameTimer(){if(S.pausedAt){S.deadline+=Date.now()-S.pausedAt;S.pausedAt=0;S.lastSec=null;paintTimer();}}
   function activeAudio(){var tracks=[].slice.call(document.querySelectorAll('audio'));Object.keys(samplePools).forEach(function(key){samplePools[key].forEach(function(track){if(tracks.indexOf(track)<0) tracks.push(track);});});if(voiceTrack&&tracks.indexOf(voiceTrack)<0) tracks.push(voiceTrack);return tracks;}
+  function pauseAll(){pauseGameTimer();activeAudio().forEach(function(audio){if(!audio.paused){audio.dataset.wasPlaying='true';audio.pause();}});try{if(window.__dcCtx&&window.__dcCtx.state==='running')window.__dcCtx.suspend();}catch(e){}}
+  window.addEventListener('pagehide',pauseAll);window.addEventListener('blur',function(){if(document.hidden)pauseAll();});
   document.addEventListener('visibilitychange',function(){
-    if(document.hidden){pauseGameTimer();activeAudio().forEach(function(audio){if(!audio.paused){audio.dataset.wasPlaying='true';audio.pause();}});}
-    else{if(inPlay()&&race()) resumeGameTimer();activeAudio().forEach(function(audio){if(audio.dataset.wasPlaying==='true'){delete audio.dataset.wasPlaying;audio.play().catch(function(){});}});}
+    if(document.hidden){pauseAll();}
+    else{try{if(window.__dcCtx)window.__dcCtx.resume();}catch(e){}if(inPlay()&&race()) resumeGameTimer();activeAudio().forEach(function(audio){if(audio.dataset.wasPlaying==='true'){delete audio.dataset.wasPlaying;audio.play().catch(function(){});}});}
   });
   function paintTimer(){
     var show=inPlay()&&race();
@@ -1255,13 +1257,11 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
 
   function renderHome(){
     var progress=loadProgress(), lock=!G.learned;
-    return '<section class="panel mt"><h2>مستشفى المدينة على المولّد</h2>'+
-      '<p>الكهربا قطعت عن المدينة كلها. مهمتك تلاقي السبب بالتحليل، والتحليل معناه التفكيك: تاخد الرقم العام وتقسّمه لحد ما السبب يبان.</p>'+
-      '<p>قدامك '+NL+' مهمات، كل واحدة أصعب من اللي قبلها. في كل مهمة: اقرا الأدلة، اختار هتفكّك بإيه، وحدّد السبب فين'+(FEAT.why?'، وبعدين ليه':'')+'.</p>'+ 
-      '<p class="say note tutorial-note">ابدأ من الرقم العام، قارنه بالمعتاد، وبعدها فكّكه خطوة خطوة. كل اختيار بيقرّبك من مكان المشكلة أو يرجّعك خطوة للمراجعة.</p>'+ 
+    return '<section class="panel mt"><h2>مستشفى المدينة على المولّد!</h2>'+
+      '<p>الكهربا قطعت عن المدينة ومولّد المستشفى بيخلص. دورك كمحقق تفكّك الأرقام وتكشف سبب العطل قبل فوات الأوان.</p>'+
       '<button class="btn '+(lock?'':'ghost')+'" id="btn-practice" data-tutorial-start>ابدأ التدريب (طريقة اللعب)</button>'+
-      (progress.level1_cleared?'<p class="progress-complete">✅ المستوى الأول: مكتمل</p><button class="btn" data-act="resume-sales">استكمال اللعب: أزمة المبيعات</button>':'<button class="btn '+(lock?'challenge-locked':'')+'" id="btn-challenge" data-act="mode" data-m="race"'+(lock?' disabled':'')+'>'+(lock?'🔒 وضع التحدي (يفتح بعد إتمام التدريب)':'وضع التحدي')+'</button>')+
-      '<p class="say note">هتبدأ بمهمة قصيرة موجهة، وبعدها القرار هيبقى قرارك.</p><button class="progress-reset" data-act="reset-progress">إعادة تعيين التقدم</button></section>';
+      (progress.level1_cleared?'<p class="progress-complete">✅ المستوى الأول: مكتمل</p><button class="btn" data-act="resume-sales">استكمال اللعب: أزمة المبيعات</button>':'<button class="btn '+(lock?'challenge-locked':'')+'" id="btn-challenge" data-act="mode" data-m="race"'+(lock?' disabled':'')+'>'+(lock?'🔒 وضع التحدي: المدينة ثم المبيعات (يفتح بعد التدريب)':'وضع التحدي')+'</button>')+
+      '<button class="progress-reset" data-act="reset-progress">إعادة تعيين التقدم</button></section>';
   }
 
   function renderPlay(){
@@ -1398,6 +1398,7 @@ button:focus-visible,.field:focus-visible{outline:3px solid var(--lamp);outline-
   }
 
   function render(){
+    if(G.view==='home'&&window.DCTutorialClose) window.DCTutorialClose();
     var v=G.view;
     game.innerHTML=v==='home'?renderHome():v==='play'?renderPlay():v==='why'?renderWhy():
       v==='won'?renderWon():v==='lost'?renderLost():v==='cityComplete'?renderCityComplete():v==='final'?renderFinalVictory():v==='reflect'?renderReflect():renderBoard();

@@ -1,8 +1,9 @@
 :root{--dc-coach-gold:#ffd15f;--dc-coach-cream:#fff8df;--dc-coach-ink:#25264e;--dc-coach-night:#070b24}
 .dc-tutorial-root{position:fixed;inset:0;z-index:2000;direction:rtl;font-family:"Almarai",sans-serif;pointer-events:none}
 .dc-tutorial-root[hidden]{display:none}
-.dc-briefing{position:absolute;inset:0;display:grid;place-items:end center;padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(4,7,28,.2),rgba(4,7,28,.92));pointer-events:auto;overflow:hidden}
-.dc-briefing-backdrop{position:fixed;inset:0;background:rgba(10,14,34,.88);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:3500;display:flex;align-items:center;justify-content:center}
+.dc-briefing{position:absolute;inset:0;display:grid;place-items:end center;padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(4,7,28,.05),rgba(4,7,28,.6));pointer-events:auto;overflow:hidden}
+.dc-briefing-backdrop{position:fixed;inset:0;background:linear-gradient(180deg,rgba(10,14,34,.35),rgba(10,14,34,.7));backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:-1}
+body.dc-tutorial-open .panel.mt{visibility:hidden}
 .dc-briefing-stage{z-index:3501}
 .dc-briefing::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 36%,rgba(255,209,95,.18),transparent 42%);animation:dc-scene-glow 4s ease-in-out infinite}
 .dc-briefing-stage{position:relative;display:grid;grid-template-columns:minmax(115px,210px) minmax(260px,620px) minmax(115px,210px);align-items:end;gap:12px;width:min(1040px,96vw);min-height:min(620px,78vh)}
